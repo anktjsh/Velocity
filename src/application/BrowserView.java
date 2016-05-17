@@ -1,0 +1,574 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package application;
+
+import application.BrowserPane.AddTab;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
+import javafx.event.Event;
+import javafx.geometry.Insets;
+import javafx.print.Printer;
+import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.CustomMenuItem;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToolBar;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.web.PopupFeatures;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+import javafx.util.Pair;
+import velocity.core.VelocityCore;
+import velocity.core.VelocityEngine;
+import velocity.core.VelocityView;
+import velocity.handler.DownloadResult;
+import velocity.handler.LoadListener;
+import velocity.handler.PopupHandler;
+import velocity.handler.PrintStatus;
+import velocity.handler.SaveHandler;
+import velocity.manager.FavoritesManager;
+
+/**
+ *
+ * @author Aniket
+ */
+public class BrowserView extends Tab {
+    
+    ImageView refreshGraphic = (new ImageView(new Image(getClass().getResourceAsStream("reload.png"), 20, 20, true, true)));
+    ImageView cancelGraphic = (new ImageView(new Image(getClass().getResourceAsStream("cancel.png"), 20, 20, true, true)));
+    
+    private final VelocityView view;
+    private final TextField field;
+    private final ToolBar bar;
+    private final Button back, forward, refresh, favorite;
+    private final MenuButton options;
+    private final CustomMenuItem zoomItem;
+    private final BorderPane main, top;
+    private final StatusBar status;
+    private final ContextMenu menu;
+    private final CheckBox dialog, popup;
+    private final Menu blocked;
+    private String lastTyped;
+    
+    public BrowserView(String url) {
+        /*
+        Rectangle a, ba;
+        setGraphic(new StackPane(
+        a = new Rectangle(2, 12.5, Color.WHITE),
+        ba = new Rectangle(2, 12.5, Color.WHITE)));
+        a.setRotate(45);
+        ba.setRotate(-45);
+         */
+        view = new VelocityView();
+        view.getEngine().enableJavaScript();
+        menu = new ContextMenu();
+        setContextMenu(menu);
+        menu.getItems().addAll(new MenuItem("New Tab"),
+                new MenuItem("Reload"),
+                new MenuItem("Close Tab"),
+                new MenuItem("Close Other Tabs"),
+                new CustomMenuItem(popup = new CheckBox("Disable Popups")),
+                new CustomMenuItem(dialog = new CheckBox("Disable Dialogs")));
+        for (MenuItem mu : menu.getItems()) {
+            if (mu instanceof CustomMenuItem) {
+                CustomMenuItem cmi = (CustomMenuItem) mu;
+                cmi.setHideOnClick(false);
+            }
+        }
+        menu.getItems().get(0).setOnAction((e) -> {
+            if (view.getEngine().getPopupHandler() != null) {
+                view.getEngine().getPopupHandler().launchPopup("https://www.google.com");
+            }
+        });
+        menu.getItems().get(1).setOnAction((e) -> {
+            view.getEngine().refreshPage();
+        });
+        menu.getItems().get(2).setOnAction((e) -> {
+            Event.fireEvent(this, new Event(Tab.TAB_CLOSE_REQUEST_EVENT));
+            getTabPane().getTabs().remove(this);
+        });
+        menu.getItems().get(3).setOnAction((e) -> {
+            int index = getTabPane().getTabs().indexOf(this);
+            for (int x = getTabPane().getTabs().size() - 1; x >= 0; x--) {
+                if (index != x) {
+                    if (getTabPane().getTabs().get(x) instanceof AddTab) {
+                        
+                    } else {
+                        Event.fireEvent(getTabPane().getTabs().get(x), new Event(Tab.TAB_CLOSE_REQUEST_EVENT));
+                        getTabPane().getTabs().remove(x);
+                    }
+                }
+            }
+        });
+        view.getEngine().dialogsSuppressedProperty().addListener((ob, older, neweer) -> {
+            dialog.setSelected(neweer);
+        });
+        view.getEngine().popupsSuppressedProperty().addListener((ob, older, neweer) -> {
+            popup.setSelected(neweer);
+        });
+        dialog.selectedProperty().addListener((ob, older, newer) -> {
+            view.getEngine().setDialogsSuppressed(newer);
+        });
+        popup.selectedProperty().addListener((ob, older, newer) -> {
+            view.getEngine().setPopupsSuppressed(newer);
+        });
+        setText("");
+        main = new BorderPane();
+        top = new BorderPane();
+        main.setTop(top);
+        field = new TextField();
+        options = new MenuButton("");
+        options.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("gear.png"), 20, 20, true, true)));
+        bar = new ToolBar();
+        refresh = new Button();
+        Tooltip t;
+        Tooltip.install(refresh, t = new Tooltip());
+        refresh.setGraphic(refreshGraphic);
+        view.getEngine().locationProperty().addListener((ob, older, newer) -> {
+            if (newer != null) {
+                field.setText(newer);
+                if (newer.startsWith("velocityfx://")) {
+                    refresh.setGraphic(refreshGraphic);
+                }
+                if (getText().isEmpty() || getText().equals("about:blank")) {
+                    if (newer.length() > 30) {
+                        setText(newer.substring(0, 30));
+                    } else {
+                        setText(newer);
+                    }
+                }
+            }
+        });
+        view.getEngine().setSaveHandler(new SaveHandler() {
+            
+            @Override
+            public DownloadResult automaticDownload(String url, String contentType, String name) {
+                String filename, extension;
+                if (name == null) {
+                    filename = url.substring(url.lastIndexOf('/') + 1);
+                } else {
+                    filename = name;
+                }
+                extension = filename.substring(filename.lastIndexOf('.') + 1);
+                String sa = VelocityCore.getDefaultDownloadsLocation() + File.separator + filename.substring(0, filename.lastIndexOf('.'));
+                File f = new File(sa + "." + extension);
+                int x = 1;
+                while (f.exists()) {
+                    f = new File(sa + " (" + x + ")" + "." + extension);
+                    x++;
+                }
+                return new DownloadResult(f, DownloadResult.CUSTOM);
+            }
+            
+            @Override
+            public DownloadResult saveAs(String url) {
+                FileChooser fc = new FileChooser();
+                if (url.contains("/")) {
+                    String fileName = url.substring(url.lastIndexOf('/') + 1);
+                    if (fileName.contains(".")) {
+                        String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
+                        File f = new File("hello." + extension);
+                        String type = null;
+                        try {
+                            type = Files.probeContentType(f.toPath());
+                        } catch (IOException ex) {
+                        }
+                        if (type != null) {
+                            fc.getExtensionFilters().add(new ExtensionFilter(extension.toUpperCase() + " File", "*." + extension));
+                        }
+                        fc.setInitialFileName(fileName);
+                    }
+                }
+                fc.getExtensionFilters().add(new ExtensionFilter("Complete WebPage", "*.html"));
+                fc.getExtensionFilters().add(new ExtensionFilter("HTML File", "*.html"));
+                if (fc.getExtensionFilters().get(0).getDescription().startsWith("Complete")) {
+                    fc.setInitialFileName("index.html");
+                }
+                File file = fc.showSaveDialog(getTabPane().getScene().getWindow());
+                if (file == null) {
+                    return new DownloadResult(null, -1);
+                }
+                if (fc.getSelectedExtensionFilter().getExtensions().contains("*.html")) {
+                    if (fc.getSelectedExtensionFilter().getDescription().contains("HTML")) {
+                        return new DownloadResult(file, DownloadResult.HTML);
+                    } else {
+                        return new DownloadResult(file, DownloadResult.COMPLETE);
+                    }
+                } else {
+                    return new DownloadResult(file, DownloadResult.CUSTOM);
+                }
+            }
+            
+            @Override
+            public DownloadResult downloadImage(String url) {
+                String filename = url.substring(url.lastIndexOf('/') + 1);
+                FileChooser fc = new FileChooser();
+                fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image", "*." + url.substring(url.lastIndexOf(".") + 1)));
+                fc.setInitialFileName(filename);
+                return new DownloadResult(fc.showSaveDialog(getTabPane().getScene().getWindow()), DownloadResult.CUSTOM);
+            }
+        });
+        view.getEngine().setViewSourceHandler((VelocityEngine engine) -> {
+            BrowserView bv;
+            getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, bv = new BrowserView(""));
+            getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
+            return bv.view.getEngine();
+        });
+        view.getEngine().setPrintHandler((job) -> {
+            List<String> choices = new ArrayList<>();
+            for (Printer p : Printer.getAllPrinters()) {
+                choices.add(p.getName());
+            }
+            ChoiceDialog<String> printer = new ChoiceDialog<>(Printer.getDefaultPrinter().getName(), choices);
+            printer.setTitle("Printer Selection");
+            printer.setHeaderText("Select a Printer");
+            printer.initOwner(getTabPane().getScene().getWindow());
+            Optional<String> show = printer.showAndWait();
+            if (show.isPresent()) {
+                Printer select = null;
+                for (Printer p : Printer.getAllPrinters()) {
+                    if (p.getName().equals(show.get())) {
+                        select = p;
+                    }
+                }
+                if (select != null) {
+                    job.setPrinter(select);
+                    return PrintStatus.CONTINUE;
+                } else {
+                    return PrintStatus.CANCEL;
+                }
+            } else {
+                return PrintStatus.CANCEL;
+            }
+        });
+        view.getEngine().setPopupHandler(new PopupHandler() {
+            @Override
+            public VelocityEngine createPopup(PopupFeatures feat) {
+                BrowserView view = new BrowserView("");
+                getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, view);
+                getTabPane().getSelectionModel().select(view);
+                return view.view.getEngine();
+            }
+            
+            @Override
+            public void launchPopup(String url) {
+                getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView(url));
+                getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
+            }
+        });
+        bar.getItems().addAll(back = new Button("", new ImageView(new Image(getClass().getResourceAsStream("right.png"), 20, 20, true, true))),
+                forward = new Button("", new ImageView(new Image(getClass().getResourceAsStream("right.png"), 20, 20, true, true))),
+                refresh,
+                field,
+                favorite = new Button("Favorite"),
+                options
+        );
+        ((ImageView) back.getGraphic()).setRotate(180);
+        bar.widthProperty().addListener((ob, older, newer) -> {
+            field.setMinWidth(newer.doubleValue() / 2);
+        });
+        back.setDisable(true);
+        forward.setDisable(true);
+        view.getEngine().canGoBackProperty().addListener((ob, older, newer) -> {
+            if (newer) {
+                back.setDisable(false);
+            } else {
+                back.setDisable(true);
+            }
+        });
+        view.getEngine().canGoForwardProperty().addListener((ob, older, newer) -> {
+            if (newer) {
+                forward.setDisable(false);
+            } else {
+                forward.setDisable(true);
+            }
+        });
+        favorite.setText("");
+        favorite.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("star.png"), 20, 20, true, true)));
+        favorite.setOnAction((e) -> {
+            if (view.getEngine().getDocument() != null) {
+                Dialog<Pair<String, String>> input = new Dialog<>();
+                input.setTitle("Favorites Item");
+                input.setHeaderText("What would you like to save this link as?");
+                input.initOwner(getTabPane().getScene().getWindow());
+                
+                ButtonType loginButtonType = new ButtonType("Confirm", ButtonData.OK_DONE);
+                input.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+                
+                GridPane grid = new GridPane();
+                grid.setHgap(10);
+                grid.setVgap(10);
+                grid.setPadding(new Insets(20, 150, 10, 10));
+                
+                TextField username = new TextField();
+                username.setPromptText("Name");
+                TextField password = new TextField();
+                password.setPromptText("URL");
+                password.setEditable(false);
+                password.setText(view.getEngine().getLocation());
+                
+                grid.add(new Label("Website Name:"), 0, 0);
+                grid.add(username, 1, 0);
+                grid.add(new Label("Website URL:"), 0, 1);
+                grid.add(password, 1, 1);
+                
+                Node loginButton = input.getDialogPane().lookupButton(loginButtonType);
+                loginButton.setDisable(true);
+                
+                username.textProperty().addListener((observable, oldValue, newValue) -> {
+                    loginButton.setDisable(newValue.trim().isEmpty());
+                });
+                
+                username.setText(view.getEngine().getTitle());
+                
+                input.getDialogPane().setContent(grid);
+                
+                Platform.runLater(() -> username.requestFocus());
+                
+                input.setResultConverter(dialogButton -> {
+                    if (dialogButton == loginButtonType) {
+                        return new Pair<>(username.getText(), password.getText());
+                    }
+                    return null;
+                });
+                
+                Optional<Pair<String, String>> result = input.showAndWait();
+                
+                result.ifPresent(res -> {
+                    boolean b = FavoritesManager.getInstance().add(res.getKey(), res.getValue());
+                    if (!b) {
+                        //favorite already exists
+                    } else {
+                        //favorite added successfully
+                    }
+                });
+            }
+        });
+        options.getItems().addAll(new MenuItem("New Tab\t\tCtrl+T"),
+                new MenuItem("History\t\tCtrl+H"),
+                new MenuItem("Downloads\tCtrl+J"),
+                zoomItem = new ZoomMenuItem(view),
+                new MenuItem("Save File As"),
+                blocked = new Menu("Blocked Popups"),
+                new MenuItem("Print\t\t\tCtrl+P"),
+                new MenuItem("Velocity Console"),
+                new MenuItem("About"),
+                new MenuItem("Exit\t\tCtrl+Shift+Q"));
+        view.getEngine().blockedUrlsList().addListener((ListChangeListener.Change<? extends String> c) -> {
+            c.next();
+            if (c.wasAdded()) {
+                for (String s : c.getAddedSubList()) {
+                    MenuItem mi;
+                    blocked.getItems().add(mi = new MenuItem((s.length() > 40) ? s.substring(0, 40) : s));
+                    mi.setOnAction((r) -> {
+                        if (view.getEngine().getPopupHandler() != null) {
+                            view.getEngine().getPopupHandler().launchPopup(mi.getText());
+                        }
+                    });
+                }
+            }
+        });
+        options.getItems().get(0).setOnAction((e) -> {
+            newTab();
+        });
+        options.getItems().get(1).setOnAction((e) -> {
+            history();
+        });
+        options.getItems().get(2).setOnAction((e) -> {
+            downloads();
+        });
+        options.getItems().get(4).setOnAction((E) -> {
+            view.getEngine().saveAs(view.getEngine().getLocation());
+        });
+        options.getItems().get(6).setOnAction((e) -> {
+            print();
+        });
+        options.getItems().get(7).setDisable(true);
+        ErrorConsole.getErrors().addListener((ListChangeListener.Change<? extends ErrorConsole.Error> c1) -> {
+            c1.next();
+            if (c1.getList().isEmpty()) {
+                options.getItems().get(7).setDisable(true);
+            } else {
+                options.getItems().get(7).setDisable(false);
+            }
+        });
+        options.getItems().get(7).setOnAction((e) -> {
+            ErrorConsole.show();
+        });
+        options.getItems().get(8).setOnAction((e) -> {
+            showAlert(AlertType.INFORMATION, getTabPane().getScene().getWindow(),
+                    "Velocity Information",
+                    "Velocity v1.0.0", "Created by Aniket Joshi");
+        });
+        options.getItems().get(9).setOnAction((e) -> {
+            exit();
+        });
+        main.setCenter(view);
+        main.setBottom(status = new StatusBar());
+        view.getEngine().setStatusListener((status1) -> {
+            status.setText(status1);
+        });
+        top.setCenter(bar);
+        top.setBottom(new FavoritesBar(view.getEngine()));
+        setContent(main);
+        view.getEngine().titleProperty().addListener((ob, older, newer) -> {
+            if (newer != null) {
+                if (newer.length() > 30) {
+                    setText(newer.substring(0, 30));
+                } else {
+                    setText(newer);
+                }
+            }
+        });
+        view.getEngine().setUserAgent(view.getEngine().getUserAgent() + " Chrome/50.0.2661.94");
+        view.getEngine().enableJavaScript();
+        view.getEngine().setProgressListener((double progress) -> {
+            t.setText((progress * 100) + "%");
+            if (progress == 1) {
+                refresh.setGraphic(refreshGraphic);
+            } else if (refresh.getGraphic() != cancelGraphic) {
+                refresh.setGraphic(cancelGraphic);
+            }
+        });
+        forward.setOnAction((e) -> {
+            view.getEngine().goForward();
+        });
+        back.setOnAction((E) -> {
+            view.getEngine().goBack();
+        });
+        refresh.setOnAction((e) -> {
+            if (refresh.getGraphic() == refreshGraphic) {
+                view.getEngine().refreshPage();
+                refresh.setGraphic(cancelGraphic);
+            } else {
+                view.getEngine().stopLoad();
+                refresh.setGraphic(refreshGraphic);
+            }
+        });
+        view.getEngine().setLoadListener(new LoadListener() {
+            @Override
+            public void onLoadCompleted() {
+            }
+            
+            @Override
+            public void onLoadCancelled() {
+            }
+            
+            @Override
+            public void onLoadReady() {
+            }
+            
+            @Override
+            public void onLoadFailed() {
+                if (lastTyped != null) {
+                    view.getEngine().load("https://www.google.com/search?q=" + lastTyped + "&oq=" + lastTyped + "&aqs=chrome..69i57j0l2j69i65j0l2.1918j0j7&sourceid=chrome&ie=UTF-8");
+                }
+            }
+            
+            @Override
+            public void onLoadScheduled() {
+            }
+            
+            @Override
+            public void onLoadRunning() {
+            }
+        });
+        field.setOnAction((e) -> {
+            (new Thread(() -> {
+                String s = field.getText();
+                lastTyped = s;
+                if (s.contains(" ")) {
+                    Platform.runLater(()
+                            -> view.getEngine().load("https://www.google.com/search?q=" + s + "&oq=" + s + "&aqs=chrome..69i57j0l2j69i65j0l2.1918j0j7&sourceid=chrome&ie=UTF-8"));
+                } else {
+                    Platform.runLater(()
+                            -> load(s));
+                }
+                Platform.runLater(()
+                        -> field.getParent().requestFocus());
+            })).start();
+        });
+        setOnClosed((E) -> {
+            view.dispose();
+        });
+        view.getEngine().load(url);
+    }
+    
+    public void newTab() {
+        getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("https://www.google.com"));
+        getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
+    }
+    
+    public void history() {
+        getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("velocityfx://history"));
+        getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
+    }
+    
+    public void downloads() {
+        getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("velocityfx://downloads"));
+        getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
+    }
+    
+    public void print() {
+        view.getEngine().print();
+    }
+    
+    public void exit() {
+        Browser.close((BrowserPane) getTabPane().getParent());
+    }
+    
+    private void load(String url) {
+        if (!url.isEmpty()) {
+            if (!url.contains(":")) {
+                url = "https://" + url;
+            }
+            view.getEngine().load(url);
+        } else {
+            view.getEngine().load(url);
+        }
+    }
+    
+    public VelocityEngine getVelocityEngine() {
+        return view.getEngine();
+    }
+    
+    public static Optional<ButtonType> showAlert(Alert.AlertType al, Window w, String title, String head, String cont) {
+        Alert ale = new Alert(al);
+        ale.initOwner(w);
+        ale.setTitle(title);
+        ale.setHeaderText(head);
+        ale.setContentText(cont);
+        if (((Stage) ale.getDialogPane().getScene().getWindow()).getIcons().isEmpty()) {
+            ((Stage) ale.getDialogPane().getScene().getWindow()).getIcons().add(new Image(BrowserView.class.getResourceAsStream("web.png")));
+        }
+        return ale.showAndWait();
+    }
+}
