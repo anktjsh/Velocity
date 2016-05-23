@@ -9,7 +9,6 @@ package velocity.cookie;
  *
  * @author Aniket
  */
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,9 +25,8 @@ import java.util.logging.Logger;
  */
 final class PublicSuffixes {
 
-    private static final Logger logger =
-            Logger.getLogger(PublicSuffixes.class.getName());
-
+    private static final Logger logger
+            = Logger.getLogger(PublicSuffixes.class.getName());
 
     /**
      * Public suffix list rule types.
@@ -39,13 +37,11 @@ final class PublicSuffixes {
         EXCEPTION_RULE,
     }
 
-
     /**
      * The mapping from domain names to public suffix list rules.
      */
-    private static final Map<String,Rule> RULES =
-            loadRules("effective_tld_names.dat");
-
+    private static final Map<String, Rule> RULES
+            = loadRules("effective_tld_names.dat");
 
     /**
      * The private default constructor. Ensures non-instantiability.
@@ -53,7 +49,6 @@ final class PublicSuffixes {
     private PublicSuffixes() {
         throw new AssertionError();
     }
-
 
     /**
      * Determines if a domain is a public suffix.
@@ -80,9 +75,9 @@ final class PublicSuffixes {
     /**
      * Loads the public suffix list from a given resource.
      */
-    private static Map<String,Rule> loadRules(String resourceName) {
+    private static Map<String, Rule> loadRules(String resourceName) {
         logger.log(Level.FINEST, "resourceName: [{0}]", resourceName);
-        Map<String,Rule> result = null;
+        Map<String, Rule> result = null;
 
         InputStream is = PublicSuffixes.class.getResourceAsStream(resourceName);
         if (is != null) {
@@ -108,7 +103,7 @@ final class PublicSuffixes {
 
         result = result != null
                 ? Collections.unmodifiableMap(result)
-                : Collections.<String,Rule>emptyMap();
+                : Collections.<String, Rule>emptyMap();
         if (logger.isLoggable(Level.FINEST)) {
             logger.log(Level.FINEST, "result: {0}", toLogString(result));
         }
@@ -118,10 +113,9 @@ final class PublicSuffixes {
     /**
      * Loads the public suffix list from a given reader.
      */
-    private static Map<String,Rule> loadRules(BufferedReader reader)
-        throws IOException
-    {
-        Map<String,Rule> result = new LinkedHashMap<>();
+    private static Map<String, Rule> loadRules(BufferedReader reader)
+            throws IOException {
+        Map<String, Rule> result = new LinkedHashMap<>();
         String line;
         while ((line = reader.readLine()) != null) {
             line = line.split("\\s+", 2)[0];
@@ -154,15 +148,14 @@ final class PublicSuffixes {
     }
 
     /**
-     * Converts a map of rules to a string suitable for displaying
-     * in the log.
+     * Converts a map of rules to a string suitable for displaying in the log.
      */
-    private static String toLogString(Map<String,Rule> rules) {
+    private static String toLogString(Map<String, Rule> rules) {
         if (rules.isEmpty()) {
             return "{}";
         }
         StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String,Rule> entry : rules.entrySet()) {
+        for (Map.Entry<String, Rule> entry : rules.entrySet()) {
             sb.append(String.format("%n    "));
             sb.append(entry.getKey());
             sb.append(": ");

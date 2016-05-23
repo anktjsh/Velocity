@@ -9,9 +9,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.scene.Node;
 import velocity.core.VelocityEngine;
 import velocity.handler.VelocityListener;
-import velocity.view.DownloadsView;
-import velocity.view.HistoryPane;
-import velocity.view.Viewer;
 
 /**
  *
@@ -25,17 +22,22 @@ public class DefaultVelocityListener extends DefaultHandler implements VelocityL
 
     @Override
     public void showDownloads(ObjectProperty<Node> node, String url) {
-        node.set(new DownloadsView(getEngine()));
     }
 
     @Override
     public void showHistory(ObjectProperty<Node> node, String url) {
-        node.set(new HistoryPane(getEngine()));
     }
 
     @Override
     public void showPageSource(ObjectProperty<Node> node, String url, String text) {
-        node.set(new Viewer(text));
+    }
+
+    @Override
+    public void showSettings(ObjectProperty<Node> node, String url) {
+    }
+
+    @Override
+    public void startPage(ObjectProperty<Node> node) {
     }
 
 }

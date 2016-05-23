@@ -15,6 +15,10 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import velocity.core.VelocityCore;
+import velocity.manager.DownloadManager;
+import velocity.manager.FavoritesManager;
+import velocity.manager.HistoryManager;
+import velocity.manager.SettingsManager;
 
 /**
  *
@@ -26,6 +30,15 @@ public class BrowserPane extends BorderPane {
     private final DownloadBar bar;
 
     public BrowserPane() {
+        (new Thread(() -> {
+            SettingsManager.initProperty("darkTheme", "false");
+            SettingsManager.initProperty("downloadLocation", System.getProperty("user.home") + File.separator + "Downloads");
+            SettingsManager.load();
+            VelocityCore.setDefaultDownloadsLocation(SettingsManager.getProperty("downloadLocation"));
+            DownloadManager.getInstance().load();
+            HistoryManager.getInstance().load();
+            FavoritesManager.getInstance().load();
+        })).start();
         setCenter(tabs = new TabPane());
         setBottom((bar = new DownloadBar()));
         tabs.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends Tab> observable, Tab oldValue, Tab newValue) -> {
@@ -43,8 +56,17 @@ public class BrowserPane extends BorderPane {
         tabs.getTabs().add(new BrowserView("https://www.google.com"));
         tabs.getTabs().add(new AddTab());
         VelocityCore.setFileLauncher((f) -> {
-            Browser.host.showDocument(f.toURI().toString());
+            Desktop.host.showDocument(f.toURI().toString());
         });
+        VelocityCore.setCookieListener((cookie) -> {
+            return true;
+        });
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            SettingsManager.save();
+            DownloadManager.getInstance().save();
+            HistoryManager.getInstance().save();
+            FavoritesManager.getInstance().save();
+        }));
     }
 
     public void close() {
@@ -103,16 +125,16 @@ public class BrowserPane extends BorderPane {
 
         public AddTab() {
             super("+");
-            setStyle("-fx-font-size:18;");
+            setStyle("-fx-font-size:16;");
             setClosable(false);
             selectedProperty().addListener((ob, older, ewer) -> {
                 if (ewer) {
                     int index = getTabPane().getTabs().indexOf(AddTab.this);
                     if (index == 0) {
-                        Browser.close(BrowserPane.this);
+                        Desktop.close(BrowserPane.this);
                     }
                     application.BrowserView bv;
-                    getTabPane().getTabs().add(index, bv = new BrowserView("https://www.google.com"));
+                    getTabPane().getTabs().add(index, bv = new BrowserView(""));
                     getTabPane().getSelectionModel().select(bv);
                 }
             });

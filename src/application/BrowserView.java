@@ -6,14 +6,20 @@
 package application;
 
 import application.BrowserPane.AddTab;
+import application.view.DownloadsView;
+import application.view.HistoryPane;
+import application.view.SettingsPane;
+import application.view.StartPage;
+import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javafx.application.Platform;
-import javafx.collections.ListChangeListener;
+import javafx.beans.property.ObjectProperty;
 import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.print.Printer;
@@ -29,7 +35,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
@@ -54,17 +59,19 @@ import velocity.handler.LoadListener;
 import velocity.handler.PopupHandler;
 import velocity.handler.PrintStatus;
 import velocity.handler.SaveHandler;
+import velocity.handler.VelocityListener;
 import velocity.manager.FavoritesManager;
+import velocity.view.Viewer;
 
 /**
  *
  * @author Aniket
  */
-public class BrowserView extends Tab {
+public class BrowserView extends Tab implements Serializable {
     
-    ImageView refreshGraphic = (new ImageView(new Image(getClass().getResourceAsStream("reload.png"), 20, 20, true, true)));
-    ImageView cancelGraphic = (new ImageView(new Image(getClass().getResourceAsStream("cancel.png"), 20, 20, true, true)));
-    
+    Node refreshGraphic = VelocityCore.isDesktop() ? (new ImageView(new Image(getClass().getResourceAsStream("reload.png"), 20, 20, true, true))) : MaterialDesignIcon.REFRESH.graphic();//;
+    Node cancelGraphic = VelocityCore.isDesktop() ? (new ImageView(new Image(getClass().getResourceAsStream("cancel.png"), 20, 20, true, true))) : MaterialDesignIcon.CANCEL.graphic();//;
+
     private final VelocityView view;
     private final TextField field;
     private final ToolBar bar;
@@ -75,18 +82,9 @@ public class BrowserView extends Tab {
     private final StatusBar status;
     private final ContextMenu menu;
     private final CheckBox dialog, popup;
-    private final Menu blocked;
     private String lastTyped;
     
     public BrowserView(String url) {
-        /*
-        Rectangle a, ba;
-        setGraphic(new StackPane(
-        a = new Rectangle(2, 12.5, Color.WHITE),
-        ba = new Rectangle(2, 12.5, Color.WHITE)));
-        a.setRotate(45);
-        ba.setRotate(-45);
-         */
         view = new VelocityView();
         view.getEngine().enableJavaScript();
         menu = new ContextMenu();
@@ -104,9 +102,7 @@ public class BrowserView extends Tab {
             }
         }
         menu.getItems().get(0).setOnAction((e) -> {
-            if (view.getEngine().getPopupHandler() != null) {
-                view.getEngine().getPopupHandler().launchPopup("https://www.google.com");
-            }
+            view.getEngine().launchPopup("");
         });
         menu.getItems().get(1).setOnAction((e) -> {
             view.getEngine().refreshPage();
@@ -140,13 +136,14 @@ public class BrowserView extends Tab {
         popup.selectedProperty().addListener((ob, older, newer) -> {
             view.getEngine().setPopupsSuppressed(newer);
         });
-        setText("");
+        setText("New Tab");
         main = new BorderPane();
         top = new BorderPane();
         main.setTop(top);
         field = new TextField();
         options = new MenuButton("");
-        options.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("gear.png"), 20, 20, true, true)));
+        options.setGraphic(VelocityCore.isDesktop() ? new ImageView(new Image(getClass().getResourceAsStream("gear.png"), 20, 20, true, true))
+                : MaterialDesignIcon.SETTINGS.graphic());
         bar = new ToolBar();
         refresh = new Button();
         Tooltip t;
@@ -157,13 +154,6 @@ public class BrowserView extends Tab {
                 field.setText(newer);
                 if (newer.startsWith("velocityfx://")) {
                     refresh.setGraphic(refreshGraphic);
-                }
-                if (getText().isEmpty() || getText().equals("about:blank")) {
-                    if (newer.length() > 30) {
-                        setText(newer.substring(0, 30));
-                    } else {
-                        setText(newer);
-                    }
                 }
             }
         });
@@ -194,7 +184,7 @@ public class BrowserView extends Tab {
                 if (url.contains("/")) {
                     String fileName = url.substring(url.lastIndexOf('/') + 1);
                     if (fileName.contains(".")) {
-                        String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
+                        String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
                         File f = new File("hello." + extension);
                         String type = null;
                         try {
@@ -231,7 +221,7 @@ public class BrowserView extends Tab {
             public DownloadResult downloadImage(String url) {
                 String filename = url.substring(url.lastIndexOf('/') + 1);
                 FileChooser fc = new FileChooser();
-                fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image", "*." + url.substring(url.lastIndexOf(".") + 1)));
+                fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image", "*." + url.substring(url.lastIndexOf('.') + 1)));
                 fc.setInitialFileName(filename);
                 return new DownloadResult(fc.showSaveDialog(getTabPane().getScene().getWindow()), DownloadResult.CUSTOM);
             }
@@ -284,14 +274,44 @@ public class BrowserView extends Tab {
                 getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
             }
         });
-        bar.getItems().addAll(back = new Button("", new ImageView(new Image(getClass().getResourceAsStream("right.png"), 20, 20, true, true))),
-                forward = new Button("", new ImageView(new Image(getClass().getResourceAsStream("right.png"), 20, 20, true, true))),
+        view.getEngine().setVelocityListener(new VelocityListener() {
+            @Override
+            public void showDownloads(ObjectProperty<Node> node, String url) {
+                node.set(new DownloadsView(view.getEngine()));
+            }
+            
+            @Override
+            public void showHistory(ObjectProperty<Node> node, String url) {
+                node.set(new HistoryPane(view.getEngine()));
+            }
+            
+            @Override
+            public void showPageSource(ObjectProperty<Node> node, String url, String text) {
+                node.set(new Viewer(text));
+            }
+            
+            @Override
+            public void showSettings(ObjectProperty<Node> node, String url) {
+                node.set(new SettingsPane(view.getEngine()));
+            }
+            
+            @Override
+            public void startPage(ObjectProperty<Node> node) {
+                node.set(new StartPage(view.getEngine()));
+            }
+        });
+        bar.getItems().addAll(back = new Button("", VelocityCore.isDesktop() ? new ImageView(new Image(getClass().getResourceAsStream("right.png"), 20, 20, true, true))
+                : MaterialDesignIcon.ARROW_BACK.graphic()),
+                forward = new Button("", VelocityCore.isDesktop() ? new ImageView(new Image(getClass().getResourceAsStream("right.png"), 20, 20, true, true))
+                                : MaterialDesignIcon.ARROW_FORWARD.graphic()),
                 refresh,
                 field,
                 favorite = new Button("Favorite"),
                 options
         );
-        ((ImageView) back.getGraphic()).setRotate(180);
+        if (back.getGraphic() instanceof ImageView) {
+            ((ImageView) back.getGraphic()).setRotate(180);
+        }
         bar.widthProperty().addListener((ob, older, newer) -> {
             field.setMinWidth(newer.doubleValue() / 2);
         });
@@ -312,7 +332,7 @@ public class BrowserView extends Tab {
             }
         });
         favorite.setText("");
-        favorite.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("star.png"), 20, 20, true, true)));
+        favorite.setGraphic(VelocityCore.isDesktop() ? new ImageView(new Image(getClass().getResourceAsStream("star.png"), 20, 20, true, true)) : MaterialDesignIcon.STAR.graphic());
         favorite.setOnAction((e) -> {
             if (view.getEngine().getDocument() != null) {
                 Dialog<Pair<String, String>> input = new Dialog<>();
@@ -359,15 +379,21 @@ public class BrowserView extends Tab {
                     }
                     return null;
                 });
-                
                 Optional<Pair<String, String>> result = input.showAndWait();
-                
                 result.ifPresent(res -> {
                     boolean b = FavoritesManager.getInstance().add(res.getKey(), res.getValue());
                     if (!b) {
-                        //favorite already exists
+                        Alert al = new Alert(AlertType.ERROR);
+                        al.initOwner(getTabPane().getScene().getWindow());
+                        al.setTitle("Favorites");
+                        al.setHeaderText("Favorite already exists!");
+                        al.showAndWait();
                     } else {
-                        //favorite added successfully
+                        Alert al = new Alert(AlertType.INFORMATION);
+                        al.initOwner(getTabPane().getScene().getWindow());
+                        al.setTitle("Favorites");
+                        al.setHeaderText("Favorite added successfully!");
+                        al.showAndWait();
                     }
                 });
             }
@@ -377,25 +403,10 @@ public class BrowserView extends Tab {
                 new MenuItem("Downloads\tCtrl+J"),
                 zoomItem = new ZoomMenuItem(view),
                 new MenuItem("Save File As"),
-                blocked = new Menu("Blocked Popups"),
                 new MenuItem("Print\t\t\tCtrl+P"),
-                new MenuItem("Velocity Console"),
+                new MenuItem("Settings"),
                 new MenuItem("About"),
                 new MenuItem("Exit\t\tCtrl+Shift+Q"));
-        view.getEngine().blockedUrlsList().addListener((ListChangeListener.Change<? extends String> c) -> {
-            c.next();
-            if (c.wasAdded()) {
-                for (String s : c.getAddedSubList()) {
-                    MenuItem mi;
-                    blocked.getItems().add(mi = new MenuItem((s.length() > 40) ? s.substring(0, 40) : s));
-                    mi.setOnAction((r) -> {
-                        if (view.getEngine().getPopupHandler() != null) {
-                            view.getEngine().getPopupHandler().launchPopup(mi.getText());
-                        }
-                    });
-                }
-            }
-        });
         options.getItems().get(0).setOnAction((e) -> {
             newTab();
         });
@@ -408,27 +419,18 @@ public class BrowserView extends Tab {
         options.getItems().get(4).setOnAction((E) -> {
             view.getEngine().saveAs(view.getEngine().getLocation());
         });
-        options.getItems().get(6).setOnAction((e) -> {
+        options.getItems().get(5).setOnAction((e) -> {
             print();
         });
-        options.getItems().get(7).setDisable(true);
-        ErrorConsole.getErrors().addListener((ListChangeListener.Change<? extends ErrorConsole.Error> c1) -> {
-            c1.next();
-            if (c1.getList().isEmpty()) {
-                options.getItems().get(7).setDisable(true);
-            } else {
-                options.getItems().get(7).setDisable(false);
-            }
+        options.getItems().get(6).setOnAction((e) -> {
+            settings();
         });
         options.getItems().get(7).setOnAction((e) -> {
-            ErrorConsole.show();
-        });
-        options.getItems().get(8).setOnAction((e) -> {
             showAlert(AlertType.INFORMATION, getTabPane().getScene().getWindow(),
                     "Velocity Information",
                     "Velocity v1.0.0", "Created by Aniket Joshi");
         });
-        options.getItems().get(9).setOnAction((e) -> {
+        options.getItems().get(8).setOnAction((e) -> {
             exit();
         });
         main.setCenter(view);
@@ -490,6 +492,12 @@ public class BrowserView extends Tab {
             public void onLoadFailed() {
                 if (lastTyped != null) {
                     view.getEngine().load("https://www.google.com/search?q=" + lastTyped + "&oq=" + lastTyped + "&aqs=chrome..69i57j0l2j69i65j0l2.1918j0j7&sourceid=chrome&ie=UTF-8");
+                } else {
+                    Alert al = new Alert(AlertType.WARNING);
+                    al.initOwner(getTabPane() != null ? getTabPane().getScene().getWindow() : null);
+                    al.setTitle("Internet");
+                    al.setHeaderText("You are not connected to the internet!");
+                    al.showAndWait();
                 }
             }
             
@@ -522,27 +530,32 @@ public class BrowserView extends Tab {
         view.getEngine().load(url);
     }
     
-    public void newTab() {
-        getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("https://www.google.com"));
+    public final void newTab() {
+        getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView(""));
         getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
     }
     
-    public void history() {
+    public final void history() {
         getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("velocityfx://history"));
         getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
     }
     
-    public void downloads() {
+    public final void settings() {
+        getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("velocityfx://settings"));
+        getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
+    }
+    
+    public final void downloads() {
         getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("velocityfx://downloads"));
         getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
     }
     
-    public void print() {
+    public final void print() {
         view.getEngine().print();
     }
     
-    public void exit() {
-        Browser.close((BrowserPane) getTabPane().getParent());
+    public final void exit() {
+        Desktop.close((BrowserPane) getTabPane().getParent());
     }
     
     private void load(String url) {
@@ -567,7 +580,7 @@ public class BrowserView extends Tab {
         ale.setHeaderText(head);
         ale.setContentText(cont);
         if (((Stage) ale.getDialogPane().getScene().getWindow()).getIcons().isEmpty()) {
-            ((Stage) ale.getDialogPane().getScene().getWindow()).getIcons().add(new Image(BrowserView.class.getResourceAsStream("web.png")));
+            ((Stage) ale.getDialogPane().getScene().getWindow()).getIcons().add(Desktop.web);
         }
         return ale.showAndWait();
     }

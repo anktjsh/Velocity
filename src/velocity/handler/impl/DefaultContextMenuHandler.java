@@ -50,9 +50,7 @@ public class DefaultContextMenuHandler extends DefaultHandler implements Context
         });
         params.addItem("View Source", (e) -> {
             String html = (String) params.getEngine().executeScript("document.documentElement.outerHTML");
-            if (getEngine().getPopupHandler() != null) {
-                getEngine().getPopupHandler().launchPopup("velocityfx://source-\t" + getEngine().getLocation() + "\t" + html);
-            }
+            getEngine().launchPopup("velocityfx://source-\t" + getEngine().getLocation() + "\t" + html);
         });
     }
 

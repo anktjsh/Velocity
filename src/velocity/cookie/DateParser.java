@@ -9,7 +9,6 @@ package velocity.cookie;
  *
  * @author Aniket
  */
-
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Collections;
@@ -28,8 +27,8 @@ import java.util.regex.Pattern;
  */
 final class DateParser {
 
-    private static final Logger logger =
-            Logger.getLogger(DateParser.class.getName());
+    private static final Logger logger
+            = Logger.getLogger(DateParser.class.getName());
 
     private static final Pattern DELIMITER_PATTERN = Pattern.compile(
             "[\\x09\\x20-\\x2F\\x3B-\\x40\\x5B-\\x60\\x7B-\\x7E]+");
@@ -39,9 +38,10 @@ final class DateParser {
             "(\\d{1,2})(?:[^\\d].*)*");
     private static final Pattern YEAR_PATTERN = Pattern.compile(
             "(\\d{2,4})(?:[^\\d].*)*");
-    private static final Map<String,Integer> MONTH_MAP;
+    private static final Map<String, Integer> MONTH_MAP;
+
     static {
-        Map<String,Integer> map = new HashMap<>(12);
+        Map<String, Integer> map = new HashMap<>(12);
         map.put("jan", 0);
         map.put("feb", 1);
         map.put("mar", 2);
@@ -57,7 +57,6 @@ final class DateParser {
         MONTH_MAP = Collections.unmodifiableMap(map);
     }
 
-
     /**
      * The private default constructor. Ensures non-instantiability.
      */
@@ -65,12 +64,12 @@ final class DateParser {
         throw new AssertionError();
     }
 
-
     /**
      * Parses a given date string as required by RFC 6265.
+     *
      * @param date the string to parse
-     * @return the difference, measured in milliseconds, between the parsed
-     *         date and midnight, January 1, 1970 UTC
+     * @return the difference, measured in milliseconds, between the parsed date
+     * and midnight, January 1, 1970 UTC
      * @throws ParseException if {@code date} cannot be parsed
      */
     static long parse(String date) throws ParseException {
@@ -94,8 +93,7 @@ final class DateParser {
 
             Integer dayOfMonthTmp;
             if (dayOfMonth == null
-                    && (dayOfMonthTmp = parseDayOfMonth(token)) != null)
-            {
+                    && (dayOfMonthTmp = parseDayOfMonth(token)) != null) {
                 dayOfMonth = dayOfMonthTmp;
                 continue;
             }
@@ -125,8 +123,7 @@ final class DateParser {
                 || year < 1601
                 || time.hour > 23
                 || time.minute > 59
-                || time.second > 59)
-        {
+                || time.second > 59) {
             throw new ParseException("Error parsing date", 0);
         }
 
@@ -170,6 +167,7 @@ final class DateParser {
      * Container for parsed time.
      */
     private static final class Time {
+
         private final int hour;
         private final int minute;
         private final int second;

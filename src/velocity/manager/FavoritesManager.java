@@ -21,14 +21,7 @@ public class FavoritesManager {
 
     private static final ObservableMap<String, String> favorites = FXCollections.observableMap(new TreeMap<>());
 
-    static {
-        load();
-    }
-
     public FavoritesManager() {
-        Runtime.getRuntime().addShutdownHook(new Thread((() -> {
-            save();
-        })));
     }
 
     public boolean add(String name, String url) {
@@ -52,7 +45,7 @@ public class FavoritesManager {
         return manager;
     }
 
-    public static void load() {
+    public void load() {
         ArrayList<String> al = new ArrayList<>();
         try {
             al.addAll(Files.readAllLines(Paths.get("favorites.txt")));

@@ -18,5 +18,9 @@ public interface VelocityListener {
 
     public void showHistory(ObjectProperty<Node> node, String url);
 
+    public void showSettings(ObjectProperty<Node> node, String url);
+
     public void showPageSource(ObjectProperty<Node> node, String url, String text);
+
+    public void startPage(ObjectProperty<Node> node);
 }

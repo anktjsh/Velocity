@@ -59,9 +59,20 @@ final class CookieStore {
      */
     CookieStore() {
         load();
-        Runtime.getRuntime().addShutdownHook(new Thread(()-> {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             save();
         }));
+    }
+    
+    List<Cookie> get() {
+        ArrayList<Cookie> al = new ArrayList<>();
+        for (String s : buckets.keySet()){
+            Map<Cookie, Cookie> map = buckets.get(s);
+            for (Cookie c : map.keySet()) {
+                al.add(c);
+            }
+        }
+        return al;
     }
 
     /**
@@ -216,18 +227,18 @@ final class CookieStore {
             for (Cookie c : cookie.keySet()) {
                 map.get(uri).add(
                         FXCollections.observableArrayList(
-                                c.getName(), 
-                                c.getValue(), 
-                                c.getExpiryTime()+"", 
-                                c.getDomain(), 
-                                c.getPath(), 
-                                c.getCreationTime().baseTime()+"", 
-                                c.getCreationTime().subtime()+"", 
-                                c.getLastAccessTime()+"", 
-                                c.getPersistent()+"", 
-                                c.getHostOnly()+"", 
-                                c.getSecureOnly()+"", 
-                                c.getHttpOnly()+""
+                                c.getName(),
+                                c.getValue(),
+                                c.getExpiryTime() + "",
+                                c.getDomain(),
+                                c.getPath(),
+                                c.getCreationTime().baseTime() + "",
+                                c.getCreationTime().subtime() + "",
+                                c.getLastAccessTime() + "",
+                                c.getPersistent() + "",
+                                c.getHostOnly() + "",
+                                c.getSecureOnly() + "",
+                                c.getHttpOnly() + ""
                         ));
             }
         }

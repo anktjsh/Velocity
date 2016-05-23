@@ -5,39 +5,50 @@
  */
 package application;
 
-import velocity.cookie.CookieManager;
-import java.net.CookieHandler;
-import javafx.application.Application;
+import com.gluonhq.charm.glisten.application.MobileApplication;
+import com.gluonhq.charm.glisten.control.AppBar;
+import com.gluonhq.charm.glisten.license.License;
+import com.gluonhq.charm.glisten.mvc.View;
+import com.gluonhq.charm.glisten.visual.Theme;
 import javafx.application.HostServices;
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
+import velocity.manager.SettingsManager;
 
 /**
  *
  * @author Aniket
  */
-public class Browser extends Application {
+public class Mobile extends MobileApplication {
 
     public static HostServices host;
 
     @Override
-    public void init() {
-        Thread.setDefaultUncaughtExceptionHandler((Thread t, Throwable e) -> {
-            ErrorConsole.addError(t, e, "");
-            e.printStackTrace();
+    public void init() throws Exception {
+        host = getHostServices();
+        addViewFactory(HOME_VIEW, () -> {
+            View v = new View("MAIN") {
+                @Override
+                protected void updateAppBar(AppBar appBar) {
+                    appBar.setVisible(false);
+                }
+
+            };
+            v.setCenter(new BrowserPane());
+            return v;
         });
     }
 
     @Override
-    public void start(Stage primary) {
-        host = getHostServices();
-        ErrorConsole.initialize(primary);
-        BrowserPane pane;
-        primary.setScene(new Scene(pane = new BrowserPane()));
+    public void postInit(Scene scene) {
+        if (Boolean.parseBoolean(SettingsManager.getProperty("darkTheme"))) {
+            Theme.DARK.assignTo(scene);
+        }
+        Stage primary = (Stage) scene.getWindow();
         primary.getScene()
                 .setOnDragOver((event) -> {
                     Dragboard db = event.getDragboard();
@@ -53,30 +64,23 @@ public class Browser extends Application {
                     boolean success = false;
                     if (db.hasFiles()) {
                         success = true;
-                        pane.loadFiles(db.getFiles());
+                        ((BrowserPane) retrieveView(HOME_VIEW).get().getCenter()).loadFiles(db.getFiles());
+                    } else if (db.getContent(new DataFormat("Tab")) != null) {
+
                     }
                     event.setDropCompleted(success);
                     event.consume();
                 });
         primary.getScene().setOnKeyPressed((e) -> {
-            pane.resolve(e);
+            ((BrowserPane) retrieveView(HOME_VIEW).get().getCenter()).resolve(e);
         });
-        primary.getScene().getStylesheets().add(getClass().getResource("material.css").toExternalForm());
-        primary.getIcons().add(new Image(getClass().getResourceAsStream("web.png")));
+        primary.getIcons().add(Desktop.web);
         primary.setTitle("Velocity v1.0.0");
         primary.setOnHidden((e) -> {
-            close(pane);
+            Desktop.close(((BrowserPane) retrieveView(HOME_VIEW).get().getCenter()));
         });
         primary.show();
+
     }
 
-    public static void close(BrowserPane pane) {
-        pane.close();
-        Platform.exit();
-        System.exit(0);
-    }
-
-    public static void main(String args[]) {
-        launch(args);
-    }
 }

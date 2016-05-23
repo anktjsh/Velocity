@@ -1,0 +1,4 @@
+darkTheme
+false
+downloadLocation
+C:\Users\Aniket\Downloads

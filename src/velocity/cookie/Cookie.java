@@ -9,7 +9,6 @@ package velocity.cookie;
  *
  * @author Aniket
  */
-
 import java.net.URI;
 import java.text.ParseException;
 import java.util.logging.Level;
@@ -20,13 +19,12 @@ import java.util.regex.Pattern;
 /**
  * An RFC 6265-compliant cookie.
  */
-final class Cookie {
+public final class Cookie {
 
-    private static final Logger logger =
-            Logger.getLogger(Cookie.class.getName());
+    private static final Logger logger
+            = Logger.getLogger(Cookie.class.getName());
     private static final Pattern IP_ADDRESS_PATTERN = Pattern.compile(
             "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})");
-
 
     private final String name;
     private final String value;
@@ -40,15 +38,13 @@ final class Cookie {
     private final boolean secureOnly;
     private final boolean httpOnly;
 
-
     /**
      * Creates a new {@code Cookie}.
      */
     public Cookie(String name, String value, long expiryTime, String domain,
             String path, ExtendedTime creationTime, long lastAccessTime,
             boolean persistent, boolean hostOnly, boolean secureOnly,
-            boolean httpOnly)
-    {
+            boolean httpOnly) {
         this.name = name;
         this.value = value;
         this.expiryTime = expiryTime;
@@ -62,10 +58,8 @@ final class Cookie {
         this.httpOnly = httpOnly;
     }
 
-
     /**
-     * Parses a {@code Set-Cookie} header string into a {@code Cookie}
-     * object.
+     * Parses a {@code Set-Cookie} header string into a {@code Cookie} object.
      */
     static Cookie parse(String setCookieString, ExtendedTime currentTime) {
         logger.log(Level.FINEST, "setCookieString: [{0}]", setCookieString);
@@ -147,8 +141,7 @@ final class Cookie {
      * Parses the value of the {@code Expires} attribute.
      */
     private static long parseExpires(String attributeValue)
-        throws ParseException
-    {
+            throws ParseException {
         try {
             return Math.max(DateParser.parse(attributeValue), 0);
         } catch (ParseException ex) {
@@ -160,8 +153,7 @@ final class Cookie {
      * Parses the value of the {@code Max-Age} attribute.
      */
     private static long parseMaxAge(String attributeValue, long currentTime)
-        throws ParseException
-    {
+            throws ParseException {
         try {
             long maxAge = Long.parseLong(attributeValue);
             if (maxAge <= 0) {
@@ -179,8 +171,7 @@ final class Cookie {
      * Parses the value of the {@code Domain} attribute.
      */
     private static String parseDomain(String attributeValue)
-        throws ParseException
-    {
+            throws ParseException {
         if (attributeValue.length() == 0) {
             throw new ParseException("Domain attribute is empty", 0);
         }
@@ -196,7 +187,6 @@ final class Cookie {
     private static String parsePath(String attributeValue) {
         return attributeValue.startsWith("/") ? attributeValue : null;
     }
-
 
     /**
      * Returns the name of this cookie.
@@ -317,7 +307,6 @@ final class Cookie {
         return System.currentTimeMillis() > expiryTime;
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -377,8 +366,7 @@ final class Cookie {
      * Determines if a domain matches another domain.
      */
     static boolean domainMatches(String domain, String cookieDomain) {
-        return domain.endsWith(cookieDomain) && (
-                domain.length() == cookieDomain.length()
+        return domain.endsWith(cookieDomain) && (domain.length() == cookieDomain.length()
                 || domain.charAt(domain.length()
                         - cookieDomain.length() - 1) == '.'
                 && !isIpAddress(domain));
@@ -419,8 +407,7 @@ final class Cookie {
      * Determines if a path matches another path.
      */
     static boolean pathMatches(String path, String cookiePath) {
-        return path != null && path.startsWith(cookiePath) && (
-                path.length() == cookiePath.length()
+        return path != null && path.startsWith(cookiePath) && (path.length() == cookiePath.length()
                 || cookiePath.endsWith("/")
                 || path.charAt(cookiePath.length()) == '/');
     }

@@ -9,7 +9,6 @@ package velocity.cookie;
  *
  * @author Aniket
  */
-
 import java.net.CookieHandler;
 import java.net.URI;
 import java.util.Arrays;
@@ -20,18 +19,17 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import velocity.core.VelocityCore;
 
 /**
  * An RFC 6265-compliant cookie handler.
  */
 public final class CookieManager extends CookieHandler {
 
-    private static final Logger logger =
-        Logger.getLogger(CookieManager.class.getName());
-
+    private static final Logger logger
+            = Logger.getLogger(CookieManager.class.getName());
 
     private final CookieStore store = new CookieStore();
-
 
     /**
      * Creates a new {@code CookieManager}.
@@ -39,17 +37,15 @@ public final class CookieManager extends CookieHandler {
     public CookieManager() {
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public Map<String,List<String>> get(URI uri,
-            Map<String,List<String>> requestHeaders)
-    {
+    public Map<String, List<String>> get(URI uri,
+            Map<String, List<String>> requestHeaders) {
         if (logger.isLoggable(Level.FINEST)) {
             logger.log(Level.FINEST, "uri: [{0}], requestHeaders: {1}",
-                    new Object[] {uri, toLogString(requestHeaders)});
+                    new Object[]{uri, toLogString(requestHeaders)});
         }
 
         if (uri == null) {
@@ -61,7 +57,7 @@ public final class CookieManager extends CookieHandler {
 
         String cookieString = get(uri);
 
-        Map<String,List<String>> result;
+        Map<String, List<String>> result;
         if (cookieString != null) {
             result = new HashMap<>();
             result.put("Cookie", Arrays.asList(cookieString));
@@ -109,15 +105,19 @@ public final class CookieManager extends CookieHandler {
 
         return sb.length() > 0 ? sb.toString() : null;
     }
+    
+    public List<Cookie> getCookies() {
+        return store.get();
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void put(URI uri, Map<String,List<String>> responseHeaders) {
+    public void put(URI uri, Map<String, List<String>> responseHeaders) {
         if (logger.isLoggable(Level.FINEST)) {
             logger.log(Level.FINEST, "uri: [{0}], responseHeaders: {1}",
-                    new Object[] {uri, toLogString(responseHeaders)});
+                    new Object[]{uri, toLogString(responseHeaders)});
         }
 
         if (uri == null) {
@@ -127,8 +127,7 @@ public final class CookieManager extends CookieHandler {
             throw new IllegalArgumentException("responseHeaders is null");
         }
 
-        for (Map.Entry<String,List<String>> entry : responseHeaders.entrySet())
-        {
+        for (Map.Entry<String, List<String>> entry : responseHeaders.entrySet()) {
             String key = entry.getKey();
             if (!"Set-Cookie".equalsIgnoreCase(key)) {
                 continue;
@@ -138,13 +137,17 @@ public final class CookieManager extends CookieHandler {
             // effectively restoring the order in which the headers were
             // received from the server. This is a temporary workaround for
             // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=7059532
-            ListIterator<String> it =
-                    entry.getValue().listIterator(entry.getValue().size());
+            ListIterator<String> it
+                    = entry.getValue().listIterator(entry.getValue().size());
             while (it.hasPrevious()) {
                 Cookie cookie = Cookie.parse(it.previous(), currentTime);
                 if (cookie != null) {
-                    put(uri, cookie);
-                    currentTime = currentTime.incrementSubtime();
+                    if (VelocityCore.getCookieListener() != null) {
+                        if (VelocityCore.getCookieListener().cookieReceived(cookie)) {
+                            put(uri, cookie);
+                            currentTime = currentTime.incrementSubtime();
+                        }
+                    }
                 }
             }
         }
@@ -216,10 +219,10 @@ public final class CookieManager extends CookieHandler {
     }
 
     /**
-     * Converts a map of HTTP headers to a string suitable for displaying
-     * in the log.
+     * Converts a map of HTTP headers to a string suitable for displaying in the
+     * log.
      */
-    private static String toLogString(Map<String,List<String>> headers) {
+    private static String toLogString(Map<String, List<String>> headers) {
         if (headers == null) {
             return null;
         }
@@ -227,7 +230,7 @@ public final class CookieManager extends CookieHandler {
             return "{}";
         }
         StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String,List<String>> entry : headers.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
             String key = entry.getKey();
             for (String value : entry.getValue()) {
                 sb.append(String.format("%n    "));

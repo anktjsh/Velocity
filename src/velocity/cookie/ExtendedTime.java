@@ -9,12 +9,10 @@ package velocity.cookie;
  *
  * @author Aniket
  */
-
 final class ExtendedTime implements Comparable<ExtendedTime> {
 
     private final long baseTime;
     private final int subtime;
-
 
     /**
      * Creates a new {@code ExtendedTime}.
@@ -24,15 +22,13 @@ final class ExtendedTime implements Comparable<ExtendedTime> {
         this.subtime = subtime;
     }
 
-
     /**
-     * Returns the current extended time with the base time initialized
-     * to System.currentTimeMillis() and the subtime initialized to zero.
+     * Returns the current extended time with the base time initialized to
+     * System.currentTimeMillis() and the subtime initialized to zero.
      */
     static ExtendedTime currentTime() {
         return new ExtendedTime(System.currentTimeMillis(), 0);
     }
-
 
     /**
      * Returns the base time.

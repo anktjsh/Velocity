@@ -20,8 +20,6 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.print.PrinterJob;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -95,7 +93,6 @@ public final class VelocityEngine {
     private final ReadOnlyBooleanWrapper canGoBackProperty = new ReadOnlyBooleanWrapper();
     private final BooleanProperty dialogsSuppressed = new SimpleBooleanProperty();
     private final BooleanProperty popupsSuppressed = new SimpleBooleanProperty();
-    private final ObservableList<String> blockedPopups = FXCollections.observableArrayList();
 
     private boolean isImage;
     private String srcUrl;
@@ -148,6 +145,12 @@ public final class VelocityEngine {
                     if (getVelocityListener() != null) {
                         getVelocityListener().showHistory(view.centerProperty(), newer);
                     }
+                } else if (newer.startsWith("velocityfx://settings")) {
+                    view.setCenter(null);
+                    titleProperty.set("Settings");
+                    if (getVelocityListener() != null) {
+                        getVelocityListener().showSettings(view.centerProperty(), newer);
+                    }
                 } else if (newer.startsWith("velocityfx://source-")) {
                     if (newer.contains("\t")) {
                         String[] spl = newer.split("\t");
@@ -159,6 +162,11 @@ public final class VelocityEngine {
                         locationProperty.set(spl[0] + spl[1]);
                     }
                 } else if (newer.isEmpty() || newer.equals("about:blank")) {
+                    titleProperty.set("New Tab");
+                    view.setCenter(null);
+                    if (getVelocityListener() != null) {
+                        getVelocityListener().startPage(view.centerProperty());
+                    }
                 } else if (contentType != null && contentType.startsWith("application/")) {
                     if (getSaveHandler() != null) {
                         String filename = getFileName(disposition);
@@ -249,8 +257,18 @@ public final class VelocityEngine {
             } else {
                 VelocityView vv = new VelocityView();
                 vv.getEngine().locationProperty.addListener((ob, older, newer) -> {
-                    blockedPopups.add(newer);
-                    vv.dispose();
+                    if (!newer.equals("about:blank")) {
+                        VelocityCore.getBlockedUrls().add(newer);
+                        (new Thread(() -> {
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                            }
+                            Platform.runLater(() -> {
+                                vv.dispose();
+                            });
+                        })).start();
+                    }
                 });
                 return vv.getEngine().web.getEngine();
             }
@@ -296,6 +314,12 @@ public final class VelocityEngine {
         setVelocityListener(new DefaultVelocityListener(this));
     }
 
+    public void launchPopup(String url) {
+        if (getPopupHandler() != null) {
+            getPopupHandler().launchPopup(url);
+        }
+    }
+
     public boolean dialogsSuppressed() {
         return dialogsSuppressed.get();
     }
@@ -328,7 +352,7 @@ public final class VelocityEngine {
                 return temp;
             } else if (one.contains("filename=\"")) {
                 String temp = one.substring(one.indexOf("filename=\"") + "filename=\"".length());
-                return temp.substring(0, temp.indexOf("\""));
+                return temp.substring(0, temp.indexOf('"'));
             }
         }
         return null;
@@ -440,14 +464,6 @@ public final class VelocityEngine {
         for (int i = 0; i < nodeList.getLength(); i++) {
             ((EventTarget) nodeList.item(i)).addEventListener("contextmenu", listener, false);
         }
-//        nodeList = doc.getElementsByTagName("*");
-//            System.out.println(nodeList.getLength());
-//            for (int i = 0; i < nodeList.getLength(); i++) {
-//                if (((Element) nodeList.item(i)).getAttribute("src") != null) {
-//                    System.out.println(((Element) nodeList.item(i)).getAttribute("src"));
-////                    ((Element) nodeList.item(i)).setAttribute("src", "hello");
-//                }
-//            }
     }
 
     private ContextMenuContent getContextMenu() {
@@ -731,10 +747,6 @@ public final class VelocityEngine {
             });
         });
         t.start();
-    }
-
-    public ObservableList<String> blockedUrlsList() {
-        return blockedPopups;
     }
 
     public void loadHtml(String html) {

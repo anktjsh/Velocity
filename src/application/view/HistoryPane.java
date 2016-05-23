@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package velocity.view;
+package application.view;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -96,9 +96,7 @@ public class HistoryPane extends BorderPane {
             box = new HBox(5);
             link = new Hyperlink();
             link.setOnAction((e) -> {
-                if (engine.getPopupHandler() != null) {
-                    engine.getPopupHandler().launchPopup(link.getText());
-                }
+                engine.launchPopup(link.getText());
             });
             setGraphic(box);
             label = new Label("");

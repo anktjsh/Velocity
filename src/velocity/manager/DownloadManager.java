@@ -20,18 +20,10 @@ import velocity.core.Download;
  */
 public class DownloadManager {
 
-    static {
-        (new Thread(() -> {
-            load();
-        })).start();
-    }
     private static final ObservableList<Download> downloads = FXCollections.observableArrayList();
     private DownloadListener down;
 
     private DownloadManager() {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            save();
-        }));
     }
 
     public ObservableList<Download> getDownloads() {
@@ -71,7 +63,7 @@ public class DownloadManager {
         public void downloadAdded(Download d);
     }
 
-    private void save() {
+    public void save() {
         System.out.println(downloads.size());
         ArrayList<String> al = new ArrayList<>();
         for (Download we : downloads) {
@@ -83,7 +75,7 @@ public class DownloadManager {
         }
     }
 
-    private static void load() {
+    public void load() {
         ArrayList<String> al = new ArrayList<>();
         try {
             al.addAll(Files.readAllLines(Paths.get("downloads.txt")));

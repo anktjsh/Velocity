@@ -22,6 +22,7 @@ import javafx.collections.ListChangeListener;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebHistory.Entry;
+import javafx.util.Pair;
 
 /**
  *
@@ -29,19 +30,34 @@ import javafx.scene.web.WebHistory.Entry;
  */
 public class HistoryManager {
 
-    private static final ArrayList<WebEntry> entries = new ArrayList<>();
-    private static final HashMap<WebEngine, List<WebEntry>> map = new HashMap<>();
+    private static class Website {
 
-    static {
-        (new Thread(() -> {
-            load();
-        })).start();
+        private final WebEntry page;
+        private int frequency;
+
+        public Website(WebEntry s) {
+            page = s;
+            frequency = 0;
+        }
+
+        public WebEntry getPage() {
+            return page;
+        }
+
+        public void increment() {
+            frequency++;
+        }
+
+        public int getFrequency() {
+            return frequency;
+        }
     }
 
+    private static final ArrayList<WebEntry> entries = new ArrayList<>();
+    private static final ArrayList<Website> frequency = new ArrayList<>();
+    private static final HashMap<WebEngine, List<WebEntry>> map = new HashMap<>();
+
     private HistoryManager() {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            save();
-        }));
     }
 
     public void addEngine(WebEngine web) {
@@ -53,10 +69,51 @@ public class HistoryManager {
                 for (WebHistory.Entry we : c.getAddedSubList()) {
                     WebEntry w;
                     entries.add(w = new WebEntry(we));
+                    Website site = contains(frequency, we.getUrl());
+                    if (site != null) {
+                    } else {
+                        frequency.add(site = new Website(w));
+                    }
+                    site.increment();
                     map.get(web).add(w);
                 }
             }
         });
+    }
+
+    public ArrayList<Pair<String, String>> getFrequency() {
+        ArrayList<Pair<String, String>> tree = new ArrayList<>();
+        ArrayList<Website> temp = new ArrayList<>();
+        while (temp.size() != frequency.size()) {
+            temp.add(getMax(frequency, temp));
+        }
+        for (Website s : temp) {
+            tree.add(new Pair<>(s.getPage().getTitle(), s.getPage().getLocation()));
+        }
+        return tree;
+    }
+
+    private static Website getMax(List<Website> a, List<Website> b) {
+        int max = 0;
+        Website temp = null;
+        for (Website s : a) {
+            if (s.getFrequency() >= max) {
+                if (!b.contains(s)) {
+                    max = s.getFrequency();
+                    temp = s;
+                }
+            }
+        }
+        return temp;
+    }
+
+    private static Website contains(List<Website> list, String s) {
+        for (Website w : list) {
+            if (w.getPage().getLocation().equals(s)) {
+                return w;
+            }
+        }
+        return null;
     }
 
     public List<WebEntry> getHistory(WebEngine web) {
@@ -67,16 +124,18 @@ public class HistoryManager {
         for (WebHistory.Entry we : ent) {
             WebEntry w;
             entries.add(w = new WebEntry(we));
+            Website site = contains(frequency, we.getUrl());
+            if (site != null) {
+            } else {
+                frequency.add(site = new Website(w));
+            }
+            site.increment();
             went.add(w);
         }
     }
 
     public ArrayList<WebEntry> getEntries() {
         return entries;
-    }
-
-    public void addEntry(String a, String b, LocalDate d, LocalTime t) {
-        entries.add(new WebEntry(a, b, d, t));
     }
 
     public static class WebEntry {
@@ -138,8 +197,7 @@ public class HistoryManager {
         }
     }
 
-    private void save() {
-        System.out.println(entries.size());
+    public void save() {
         ArrayList<String> al = new ArrayList<>();
         for (WebEntry we : entries) {
             al.add(we.toString());
@@ -150,7 +208,7 @@ public class HistoryManager {
         }
     }
 
-    private static void load() {
+    public void load() {
         ArrayList<String> al = new ArrayList<>();
         try {
             al.addAll(Files.readAllLines(Paths.get("history.txt")));
@@ -159,13 +217,22 @@ public class HistoryManager {
         for (String s : al) {
             String[] spl = s.split(",");
             if (spl.length == 4) {
-                entries.add(new WebEntry(spl[0], spl[1], LocalDate.parse(spl[2]), LocalTime.parse(spl[3])));
+                WebEntry w;
+                entries.add(w = new WebEntry(spl[0], spl[1], LocalDate.parse(spl[2]), LocalTime.parse(spl[3])));
+                Website site = contains(frequency, spl[0]);
+                if (site != null) {
+                } else {
+                    frequency.add(site = new Website(w));
+                }
+                site.increment();
             }
         }
     }
 
     public void clear() {
         entries.clear();
+        map.clear();
+        frequency.clear();
     }
 
     public static HistoryManager getInstance() {
