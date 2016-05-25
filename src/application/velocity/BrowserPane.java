@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package application;
+package application.velocity;
 
+import application.features.DownloadBar;
 import java.io.File;
 import java.util.List;
 import javafx.beans.value.ObservableValue;
@@ -133,7 +134,7 @@ public class BrowserPane extends BorderPane {
                     if (index == 0) {
                         Desktop.close(BrowserPane.this);
                     }
-                    application.BrowserView bv;
+                    application.velocity.BrowserView bv;
                     getTabPane().getTabs().add(index, bv = new BrowserView(""));
                     getTabPane().getSelectionModel().select(bv);
                 }

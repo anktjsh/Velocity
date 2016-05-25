@@ -3,9 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package application;
+package application.velocity;
 
-import application.BrowserPane.AddTab;
+import application.features.StatusBar;
+import application.features.ZoomMenuItem;
+import application.features.FavoritesBar;
+import application.velocity.BrowserPane.AddTab;
 import application.view.DownloadsView;
 import application.view.HistoryPane;
 import application.view.SettingsPane;
@@ -478,6 +481,8 @@ public class BrowserView extends Tab implements Serializable {
         view.getEngine().setLoadListener(new LoadListener() {
             @Override
             public void onLoadCompleted() {
+                //take snapshot
+                //thumbnail
             }
             
             @Override

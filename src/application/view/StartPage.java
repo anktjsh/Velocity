@@ -39,7 +39,7 @@ public class StartPage extends BorderPane {
         }
         for (Node n : grid.getChildren()) {
             if (n instanceof Button) {
-                Button b = (Button)n;
+                Button b = (Button) n;
                 b.setMinSize(125, 125);
                 b.setMaxSize(125, 125);
             }
@@ -47,7 +47,7 @@ public class StartPage extends BorderPane {
     }
 
     public final Button newButton(String text, String url) {
-        Button b = new Button(text);
+        Button b = new Button(text.isEmpty() ? url : text);
         b.setOnAction((e) -> {
             engine.load(url);
         });

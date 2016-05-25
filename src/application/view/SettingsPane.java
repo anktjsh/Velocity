@@ -5,7 +5,7 @@
  */
 package application.view;
 
-import application.Desktop;
+import application.velocity.Desktop;
 import com.gluonhq.charm.glisten.visual.Theme;
 import java.io.File;
 import java.net.CookieHandler;
@@ -127,7 +127,7 @@ public class SettingsPane extends BorderPane {
                 goToBlocked.setDisable(true);
             }
         });
-        box.getChildren().add(cookieBox = new HBox(5, new Label("Cookies"), cookieView = new ListView(), new VBox(10,
+        box.getChildren().add(cookieBox = new HBox(5, new Label("Cookies"), cookieView = new ListView<>(), new VBox(10,
                 removeCookie = new Button("Remove"))));
         cookieBox.setAlignment(Pos.CENTER);
         cookieView.setMaxSize(300, 300);

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package application;
+package application.features;
 
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import java.text.DecimalFormat;
