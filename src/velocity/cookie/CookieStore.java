@@ -74,6 +74,14 @@ final class CookieStore {
         }
         return al;
     }
+    
+    public void remove(Cookie c) {
+        if (buckets.keySet().contains(c.getDomain())) {
+            if (buckets.get(c.getDomain()).get(c)!=null) {
+                buckets.get(c.getDomain()).remove(c);
+            }
+        }
+    }
 
     /**
      * Returns the currently stored cookie with the same name, domain, and path

@@ -36,6 +36,10 @@ public final class CookieManager extends CookieHandler {
      */
     public CookieManager() {
     }
+    
+    public void remove(Cookie co) {
+        store.remove(co);
+    }
 
     /**
      * {@inheritDoc}

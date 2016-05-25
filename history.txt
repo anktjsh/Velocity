@@ -6,3 +6,12 @@ http://www.razerzone.com/store/razer-blade,The New Razer Blade,2016-05-20,14:08:
 http://www.razerzone.com/store/razer-blade#products,The New Razer Blade,2016-05-20,14:09:29.550
 https://www.google.com/,Google,2016-05-23,08:45:21.128
 https://www.google.com/,Google,2016-05-23,08:56:46.043
+https://www.google.com/,Google,2016-05-25,00:49:07.851
+https://www.google.com/,Google,2016-05-25,00:53:31.217
+https://www.google.com/,Google,2016-05-25,07:53:32.506
+https://www.google.com/,Google,2016-05-25,07:55:01.223
+https://www.google.com/,Google,2016-05-25,07:55:47.559
+https://www.google.com/,Google,2016-05-25,07:57:00.634
+https://www.google.com/,Google,2016-05-25,07:57:56.505
+https://www.google.com/,Google,2016-05-25,08:00:41.907
+https://www.google.com/,Google,2016-05-25,08:06:40.104

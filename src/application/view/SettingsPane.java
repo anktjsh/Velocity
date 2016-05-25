@@ -43,7 +43,7 @@ public class SettingsPane extends BorderPane {
     private final ListView<String> blocked;
     private final HBox blockedBox;
     private final Button removeBlockedFromList, goToBlocked;
-    private final ListView<String> cookieView;
+    private final ListView<Cookie> cookieView;
     private final HBox cookieBox;
     private final Button removeCookie;
 
@@ -83,14 +83,12 @@ public class SettingsPane extends BorderPane {
                 } else {
                     getScene().getStylesheets().remove(Desktop.material);
                 }
+            } else if (check.isSelected()) {
+                Theme.DARK.assignTo(getScene());
             } else {
-                if (check.isSelected()) {
-                    Theme.DARK.assignTo(getScene());
-                } else {
-                    Theme.LIGHT.assignTo(getScene());
-                }
+                Theme.LIGHT.assignTo(getScene());
             }
-            SettingsManager.setProperty("darkTheme", check.isSelected()+"");
+            SettingsManager.setProperty("darkTheme", check.isSelected() + "");
         });
         box.getChildren().addAll(blockedBox = new HBox(5, new Label("Blocked Popups"), blocked = new ListView<>(), new VBox(10, removeBlockedFromList = new Button("Remove"),
                 goToBlocked = new Button("Go To"))));
@@ -133,20 +131,14 @@ public class SettingsPane extends BorderPane {
         cookieView.setMaxSize(300, 300);
         List<Cookie> cookies = ((velocity.cookie.CookieManager) CookieHandler.getDefault()).getCookies();
         for (Cookie c : cookies) {
-            cookieView.getItems().add(c.toString());
+            cookieView.getItems().add(c);
         }
         removeCookie.setDisable(true);
         removeCookie.setOnAction((E) -> {
             if (cookieView.getSelectionModel().getSelectedItem() != null) {
-                Cookie sel = null;
-                for (Cookie c : cookies) {
-                    if (c.toString().equals(cookieView.getSelectionModel().getSelectedItem())) {
-                        sel = c;
-                    }
-                }
-                if (sel != null) {
-                    cookies.remove(sel);
-                }
+                Cookie selected = cookieView.getSelectionModel().getSelectedItem();
+                ((velocity.cookie.CookieManager) CookieHandler.getDefault()).remove(selected);
+                cookieView.getItems().remove(selected);
             }
         });
         cookieView.getSelectionModel().selectedItemProperty().addListener((ob, older, newer) -> {
@@ -159,7 +151,6 @@ public class SettingsPane extends BorderPane {
         box.getChildren().addAll(new Label("Velocity v1.0.0 Created by Aniket Joshi"));
         sceneProperty().addListener((ob, older, newer) -> {
             if (newer != null) {
-//                check.setSelected(newer.getStylesheets().contains(Browser.material));
                 box.setMinWidth(newer.getWidth() - 35);
             }
         });
