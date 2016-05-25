@@ -63,10 +63,10 @@ final class CookieStore {
             save();
         }));
     }
-    
+
     List<Cookie> get() {
         ArrayList<Cookie> al = new ArrayList<>();
-        for (String s : buckets.keySet()){
+        for (String s : buckets.keySet()) {
             Map<Cookie, Cookie> map = buckets.get(s);
             for (Cookie c : map.keySet()) {
                 al.add(c);
@@ -74,10 +74,10 @@ final class CookieStore {
         }
         return al;
     }
-    
+
     public void remove(Cookie c) {
         if (buckets.keySet().contains(c.getDomain())) {
-            if (buckets.get(c.getDomain()).get(c)!=null) {
+            if (buckets.get(c.getDomain()).get(c) != null) {
                 buckets.get(c.getDomain()).remove(c);
             }
         }

@@ -14,14 +14,16 @@ import javax.swing.JPanel;
  *
  * @author swatijoshi
  */
-class VelocityComponent extends JPanel{
+class VelocityComponent extends JPanel {
+
     private final JFXPanel panel;
     private final VelocityView view;
+
     public VelocityComponent() {
         panel = new JFXPanel();
         view = new VelocityView();
     }
-    
+
     public void init() {
         Platform.runLater(() -> {
             panel.setScene(new Scene(view));

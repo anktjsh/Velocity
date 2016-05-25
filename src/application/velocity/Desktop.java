@@ -21,11 +21,11 @@ import velocity.manager.SettingsManager;
  * @author Aniket
  */
 public class Desktop extends Application {
-    
+
     public static HostServices host;
     public static final String material = Desktop.class.getResource("material.css").toExternalForm();
     public static final Image web = new Image(Desktop.class.getResourceAsStream("web.png"));
-    
+
     @Override
     public void start(Stage primary) {
         host = getHostServices();
@@ -48,7 +48,7 @@ public class Desktop extends Application {
                         success = true;
                         pane.loadFiles(db.getFiles());
                     } else if (db.getContent(new DataFormat("Tab")) != null) {
-                        
+
                     }
                     event.setDropCompleted(success);
                     event.consume();
@@ -66,13 +66,13 @@ public class Desktop extends Application {
         });
         primary.show();
     }
-    
+
     public static void close(BrowserPane pane) {
         pane.close();
         Platform.exit();
         System.exit(0);
     }
-    
+
     public static void main(String args[]) {
         launch(args);
     }

@@ -71,7 +71,7 @@ import velocity.view.Viewer;
  * @author Aniket
  */
 public class BrowserView extends Tab implements Serializable {
-    
+
     Node refreshGraphic = VelocityCore.isDesktop() ? (new ImageView(new Image(getClass().getResourceAsStream("reload.png"), 20, 20, true, true))) : MaterialDesignIcon.REFRESH.graphic();//;
     Node cancelGraphic = VelocityCore.isDesktop() ? (new ImageView(new Image(getClass().getResourceAsStream("cancel.png"), 20, 20, true, true))) : MaterialDesignIcon.CANCEL.graphic();//;
 
@@ -86,7 +86,7 @@ public class BrowserView extends Tab implements Serializable {
     private final ContextMenu menu;
     private final CheckBox dialog, popup;
     private String lastTyped;
-    
+
     public BrowserView(String url) {
         view = new VelocityView();
         view.getEngine().enableJavaScript();
@@ -119,7 +119,7 @@ public class BrowserView extends Tab implements Serializable {
             for (int x = getTabPane().getTabs().size() - 1; x >= 0; x--) {
                 if (index != x) {
                     if (getTabPane().getTabs().get(x) instanceof AddTab) {
-                        
+
                     } else {
                         Event.fireEvent(getTabPane().getTabs().get(x), new Event(Tab.TAB_CLOSE_REQUEST_EVENT));
                         getTabPane().getTabs().remove(x);
@@ -161,7 +161,7 @@ public class BrowserView extends Tab implements Serializable {
             }
         });
         view.getEngine().setSaveHandler(new SaveHandler() {
-            
+
             @Override
             public DownloadResult automaticDownload(String url, String contentType, String name) {
                 String filename, extension;
@@ -180,7 +180,7 @@ public class BrowserView extends Tab implements Serializable {
                 }
                 return new DownloadResult(f, DownloadResult.CUSTOM);
             }
-            
+
             @Override
             public DownloadResult saveAs(String url) {
                 FileChooser fc = new FileChooser();
@@ -219,7 +219,7 @@ public class BrowserView extends Tab implements Serializable {
                     return new DownloadResult(file, DownloadResult.CUSTOM);
                 }
             }
-            
+
             @Override
             public DownloadResult downloadImage(String url) {
                 String filename = url.substring(url.lastIndexOf('/') + 1);
@@ -270,7 +270,7 @@ public class BrowserView extends Tab implements Serializable {
                 getTabPane().getSelectionModel().select(view);
                 return view.view.getEngine();
             }
-            
+
             @Override
             public void launchPopup(String url) {
                 getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView(url));
@@ -282,22 +282,22 @@ public class BrowserView extends Tab implements Serializable {
             public void showDownloads(ObjectProperty<Node> node, String url) {
                 node.set(new DownloadsView(view.getEngine()));
             }
-            
+
             @Override
             public void showHistory(ObjectProperty<Node> node, String url) {
                 node.set(new HistoryPane(view.getEngine()));
             }
-            
+
             @Override
             public void showPageSource(ObjectProperty<Node> node, String url, String text) {
                 node.set(new Viewer(text));
             }
-            
+
             @Override
             public void showSettings(ObjectProperty<Node> node, String url) {
                 node.set(new SettingsPane(view.getEngine()));
             }
-            
+
             @Override
             public void startPage(ObjectProperty<Node> node) {
                 node.set(new StartPage(view.getEngine()));
@@ -306,7 +306,7 @@ public class BrowserView extends Tab implements Serializable {
         bar.getItems().addAll(back = new Button("", VelocityCore.isDesktop() ? new ImageView(new Image(getClass().getResourceAsStream("right.png"), 20, 20, true, true))
                 : MaterialDesignIcon.ARROW_BACK.graphic()),
                 forward = new Button("", VelocityCore.isDesktop() ? new ImageView(new Image(getClass().getResourceAsStream("right.png"), 20, 20, true, true))
-                                : MaterialDesignIcon.ARROW_FORWARD.graphic()),
+                        : MaterialDesignIcon.ARROW_FORWARD.graphic()),
                 refresh,
                 field,
                 favorite = new Button("Favorite"),
@@ -342,40 +342,40 @@ public class BrowserView extends Tab implements Serializable {
                 input.setTitle("Favorites Item");
                 input.setHeaderText("What would you like to save this link as?");
                 input.initOwner(getTabPane().getScene().getWindow());
-                
+
                 ButtonType loginButtonType = new ButtonType("Confirm", ButtonData.OK_DONE);
                 input.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
-                
+
                 GridPane grid = new GridPane();
                 grid.setHgap(10);
                 grid.setVgap(10);
                 grid.setPadding(new Insets(20, 150, 10, 10));
-                
+
                 TextField username = new TextField();
                 username.setPromptText("Name");
                 TextField password = new TextField();
                 password.setPromptText("URL");
                 password.setEditable(false);
                 password.setText(view.getEngine().getLocation());
-                
+
                 grid.add(new Label("Website Name:"), 0, 0);
                 grid.add(username, 1, 0);
                 grid.add(new Label("Website URL:"), 0, 1);
                 grid.add(password, 1, 1);
-                
+
                 Node loginButton = input.getDialogPane().lookupButton(loginButtonType);
                 loginButton.setDisable(true);
-                
+
                 username.textProperty().addListener((observable, oldValue, newValue) -> {
                     loginButton.setDisable(newValue.trim().isEmpty());
                 });
-                
+
                 username.setText(view.getEngine().getTitle());
-                
+
                 input.getDialogPane().setContent(grid);
-                
+
                 Platform.runLater(() -> username.requestFocus());
-                
+
                 input.setResultConverter(dialogButton -> {
                     if (dialogButton == loginButtonType) {
                         return new Pair<>(username.getText(), password.getText());
@@ -484,15 +484,15 @@ public class BrowserView extends Tab implements Serializable {
                 //take snapshot
                 //thumbnail
             }
-            
+
             @Override
             public void onLoadCancelled() {
             }
-            
+
             @Override
             public void onLoadReady() {
             }
-            
+
             @Override
             public void onLoadFailed() {
                 if (lastTyped != null) {
@@ -505,11 +505,11 @@ public class BrowserView extends Tab implements Serializable {
                     al.showAndWait();
                 }
             }
-            
+
             @Override
             public void onLoadScheduled() {
             }
-            
+
             @Override
             public void onLoadRunning() {
             }
@@ -534,35 +534,35 @@ public class BrowserView extends Tab implements Serializable {
         });
         view.getEngine().load(url);
     }
-    
+
     public final void newTab() {
         getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView(""));
         getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
     }
-    
+
     public final void history() {
         getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("velocityfx://history"));
         getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
     }
-    
+
     public final void settings() {
         getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("velocityfx://settings"));
         getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
     }
-    
+
     public final void downloads() {
         getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("velocityfx://downloads"));
         getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
     }
-    
+
     public final void print() {
         view.getEngine().print();
     }
-    
+
     public final void exit() {
         Desktop.close((BrowserPane) getTabPane().getParent());
     }
-    
+
     private void load(String url) {
         if (!url.isEmpty()) {
             if (!url.contains(":")) {
@@ -573,11 +573,11 @@ public class BrowserView extends Tab implements Serializable {
             view.getEngine().load(url);
         }
     }
-    
+
     public VelocityEngine getVelocityEngine() {
         return view.getEngine();
     }
-    
+
     public static Optional<ButtonType> showAlert(Alert.AlertType al, Window w, String title, String head, String cont) {
         Alert ale = new Alert(al);
         ale.initOwner(w);

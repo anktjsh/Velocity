@@ -36,7 +36,7 @@ public final class CookieManager extends CookieHandler {
      */
     public CookieManager() {
     }
-    
+
     public void remove(Cookie co) {
         store.remove(co);
     }
@@ -109,7 +109,7 @@ public final class CookieManager extends CookieHandler {
 
         return sb.length() > 0 ? sb.toString() : null;
     }
-    
+
     public List<Cookie> getCookies() {
         return store.get();
     }

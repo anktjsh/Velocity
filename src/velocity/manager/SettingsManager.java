@@ -29,17 +29,17 @@ public class SettingsManager {
             al.addAll(Files.readAllLines(new File("properties.txt").toPath()));
         } catch (IOException ex) {
         }
-        for (int x=0;x<al.size();x+=2) {
-            if (properties.keySet().contains(al.get(x))){
-                properties.put(al.get(x), al.get(x+1));
+        for (int x = 0; x < al.size(); x += 2) {
+            if (properties.keySet().contains(al.get(x))) {
+                properties.put(al.get(x), al.get(x + 1));
             }
         }
     }
-    
+
     public static String getProperty(String key) {
         return properties.get(key);
     }
-    
+
     public static void setProperty(String a, String b) {
         properties.put(a, b);
     }

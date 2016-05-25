@@ -12,5 +12,6 @@ import velocity.cookie.Cookie;
  * @author Aniket
  */
 public interface CookieListener {
+
     public boolean cookieReceived(Cookie cookie);
 }

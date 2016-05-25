@@ -180,7 +180,7 @@ public class VelocityCore {
             fileLauncher.set(handl);
         }
     }
-    
+
     public static List<String> getBlockedUrls() {
         return blocked;
     }
