@@ -10,9 +10,7 @@ package velocity.cookie;
  * @author Aniket
  */
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,6 +25,7 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
+import velocity.util.FileUtils;
 
 /**
  * A cookie store.
@@ -64,6 +63,14 @@ final class CookieStore {
         }));
     }
 
+    public void remove(Cookie c) {
+        if (buckets.keySet().contains(c.getDomain())) {
+            if (buckets.get(c.getDomain()).get(c) != null) {
+                buckets.get(c.getDomain()).remove(c);
+            }
+        }
+    }
+
     List<Cookie> get() {
         ArrayList<Cookie> al = new ArrayList<>();
         for (String s : buckets.keySet()) {
@@ -73,14 +80,6 @@ final class CookieStore {
             }
         }
         return al;
-    }
-
-    public void remove(Cookie c) {
-        if (buckets.keySet().contains(c.getDomain())) {
-            if (buckets.get(c.getDomain()).get(c) != null) {
-                buckets.get(c.getDomain()).remove(c);
-            }
-        }
     }
 
     /**
@@ -257,18 +256,12 @@ final class CookieStore {
                 al.add(u + "=" + list);
             }
         }
-        try {
-            Files.write(f.toPath(), al);
-        } catch (IOException ex) {
-        }
+        FileUtils.write(f, al);
     }
 
     public void load() {
         ArrayList<String> al = new ArrayList<>();
-        try {
-            al.addAll(Files.readAllLines(new File("cookies.txt").toPath()));
-        } catch (IOException ex) {
-        }
+        al.addAll(FileUtils.readAllLines(new File("cookies.txt")));
         for (String s : al) {
             String temp = s.substring(0, s.indexOf("="));
             URI uri = URI.create(temp);

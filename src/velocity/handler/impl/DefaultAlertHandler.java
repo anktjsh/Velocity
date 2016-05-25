@@ -7,6 +7,7 @@ package velocity.handler.impl;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
+import velocity.core.VelocityCore;
 import velocity.core.VelocityEngine;
 import velocity.handler.AlertHandler;
 import velocity.handler.WebAlert;
@@ -23,17 +24,24 @@ public class DefaultAlertHandler extends DefaultHandler implements AlertHandler 
 
     @Override
     public void handle(WebAlert event) {
-        Alert al = new Alert(Alert.AlertType.INFORMATION);
-        al.initOwner(getEngine().getVelocityView().getScene() == null ? null : getEngine().getVelocityView().getScene().getWindow());
-        al.setTitle("Alert");
-        al.setHeaderText(event.getData());
-        CheckBox box = new CheckBox("Stop showing any more dialogs");
-        box.selectedProperty().addListener((ob, older, newer) -> {
-            getEngine().setDialogsSuppressed(newer);
-        });
-        al.getDialogPane().setExpandableContent(box);
-        al.getDialogPane().setExpanded(true);
-        al.showAndWait();
+        if (VelocityCore.isDesktop()) {
+            Alert al = new Alert(Alert.AlertType.INFORMATION);
+            al.initOwner(getEngine().getVelocityView().getScene() == null ? null : getEngine().getVelocityView().getScene().getWindow());
+            al.setTitle("Alert");
+            al.setHeaderText(event.getData());
+            CheckBox box = new CheckBox("Stop showing any more dialogs");
+            box.selectedProperty().addListener((ob, older, newer) -> {
+                getEngine().setDialogsSuppressed(newer);
+            });
+            al.getDialogPane().setExpandableContent(box);
+            al.getDialogPane().setExpanded(true);
+            al.showAndWait();
+        } else {
+            com.gluonhq.charm.glisten.control.Alert al = new com.gluonhq.charm.glisten.control.Alert(Alert.AlertType.INFORMATION);
+            al.setTitleText("Alert");
+            al.setContentText(event.getData());
+            al.showAndWait();
+        }
     }
 
 }

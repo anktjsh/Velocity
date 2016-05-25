@@ -7,7 +7,6 @@ package velocity.core;
 
 import com.sun.javafx.scene.control.skin.ContextMenuContent;
 import java.io.File;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -62,7 +61,6 @@ import velocity.handler.impl.DefaultViewSourceHandler;
 import velocity.manager.DownloadManager;
 import velocity.manager.HistoryManager;
 import velocity.manager.HistoryManager.WebEntry;
-import velocity.view.PdfReader;
 
 /**
  *
@@ -103,9 +101,13 @@ public final class VelocityEngine {
     VelocityEngine(VelocityView v) {
         view = v;
         web = new WebView();
-        defaultUserAgent = web.getEngine().getUserAgent();
-        if (VelocityCore.getDefaultUserAgent() != null) {
-            web.getEngine().setUserAgent(VelocityCore.getDefaultUserAgent());
+        if (VelocityCore.isDesktop()) {
+            defaultUserAgent = web.getEngine().getUserAgent();
+            if (VelocityCore.getDefaultUserAgent() != null) {
+                web.getEngine().setUserAgent(VelocityCore.getDefaultUserAgent());
+            }
+        } else {
+            defaultUserAgent = "";
         }
         web.setOnDragOver((event) -> {
             event.consume();
@@ -177,8 +179,8 @@ public final class VelocityEngine {
                 } else if (newer.endsWith(".pdf")) {
                     view.setCenter(null);
                     File f;
-                    view.setCenter(new PdfReader(f = new File(URI.create(newer))));
-                    titleProperty.set(f.getName());
+//                    view.setCenter(new PdfReader(f = new File(URI.create(newer))));
+//                    titleProperty.set(f.getName());
                 } else if (!(view.getCenter() instanceof WebView)) {
                     view.setCenter(web);
                 }
@@ -295,11 +297,13 @@ public final class VelocityEngine {
                 getStatusListener().statusChanged(event.getData());
             }
         });
-        web.getEngine().setOnError((event) -> {
-            if (getErrorHandler() != null) {
-                getErrorHandler().handle(event);
-            }
-        });
+        if (VelocityCore.isDesktop()) {
+            web.getEngine().setOnError((event) -> {
+                if (getErrorHandler() != null) {
+                    getErrorHandler().handle(event);
+                }
+            });
+        }
 //        web.getEngine().setOnResized(null);
 //        web.getEngine().setOnVisibilityChanged(null);
         setPromptHandler(new DefaultPromptHandler(this));
@@ -371,7 +375,10 @@ public final class VelocityEngine {
     }
 
     public String getUserAgent() {
-        return web.getEngine().getUserAgent();
+        if (VelocityCore.isDesktop()) {
+            return web.getEngine().getUserAgent();
+        }
+        return "";
     }
 
     public ObjectProperty<String> titleProperty() {
@@ -403,23 +410,34 @@ public final class VelocityEngine {
     }
 
     public void setUserAgent(String useragent) {
-        web.getEngine().setUserAgent(useragent);
+        if (VelocityCore.isDesktop()) {
+            web.getEngine().setUserAgent(useragent);
+        }
     }
 
     public void restoreUserAgent() {
-        web.getEngine().setUserAgent(defaultUserAgent);
+        if (VelocityCore.isDesktop()) {
+            web.getEngine().setUserAgent(defaultUserAgent);
+        }
     }
 
     public void enableJavaScript() {
-        web.getEngine().setJavaScriptEnabled(true);
+        if (VelocityCore.isDesktop()) {
+            web.getEngine().setJavaScriptEnabled(true);
+        }
     }
 
     public void disableJavascript() {
-        web.getEngine().setJavaScriptEnabled(false);
+        if (VelocityCore.isDesktop()) {
+            web.getEngine().setJavaScriptEnabled(false);
+        }
     }
 
     public boolean isJavaScriptEnabled() {
-        return web.getEngine().isJavaScriptEnabled();
+        if (VelocityCore.isDesktop()) {
+            return web.getEngine().isJavaScriptEnabled();
+        }
+        return false;
     }
 
     public String getLocation() {

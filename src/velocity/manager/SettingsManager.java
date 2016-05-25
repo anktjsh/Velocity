@@ -6,10 +6,9 @@
 package velocity.manager;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.TreeMap;
+import velocity.util.FileUtils;
 
 /**
  *
@@ -25,10 +24,7 @@ public class SettingsManager {
 
     public static void load() {
         ArrayList<String> al = new ArrayList<>();
-        try {
-            al.addAll(Files.readAllLines(new File("properties.txt").toPath()));
-        } catch (IOException ex) {
-        }
+        al.addAll(FileUtils.readAllLines(new File("properties.txt")));
         for (int x = 0; x < al.size(); x += 2) {
             if (properties.keySet().contains(al.get(x))) {
                 properties.put(al.get(x), al.get(x + 1));
@@ -50,9 +46,6 @@ public class SettingsManager {
             al.add(s);
             al.add(properties.get(s));
         }
-        try {
-            Files.write(new File("properties.txt").toPath(), al);
-        } catch (IOException ex) {
-        }
+        FileUtils.write(new File("properties.txt"), al);
     }
 }

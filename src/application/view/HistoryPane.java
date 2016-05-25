@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Optional;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Hyperlink;
@@ -24,6 +23,7 @@ import javafx.scene.text.Font;
 import velocity.core.VelocityEngine;
 import velocity.manager.HistoryManager;
 import velocity.manager.HistoryManager.WebEntry;
+import velocity.util.DialogUtils;
 
 /**
  *
@@ -72,11 +72,7 @@ public class HistoryPane extends BorderPane {
         }
         view.getItems().addAll(allEntries);
         clear.setOnAction((e) -> {
-            Alert al = new Alert(AlertType.CONFIRMATION);
-            al.setTitle("Confirm");
-            al.setHeaderText("Are you sure you want to clear these entries?");
-            al.initOwner(getScene() == null ? null : getScene().getWindow());
-            Optional<ButtonType> show = al.showAndWait();
+            Optional<ButtonType> show = DialogUtils.showAlert(Alert.AlertType.CONFIRMATION, getScene() == null ? null : getScene().getWindow(), "Confirm", "Are you sure you want to clear these entries?", "");
             if (show.isPresent()) {
                 if (show.get() == ButtonType.OK) {
                     HistoryManager.getInstance().clear();

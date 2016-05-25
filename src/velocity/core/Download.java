@@ -6,14 +6,13 @@
 package velocity.core;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -26,11 +25,11 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import velocity.handler.DownloadResult;
+import velocity.util.FileUtils;
 
 /**
  *
@@ -120,7 +119,7 @@ public class Download extends Task<File> {
                     InputStream stream = getStream(remoteUrl).getKey();
                     File dir = localFile.getParentFile();
                     dir.mkdirs();
-                    Files.copy(stream, localFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    FileUtils.copy(stream, new FileOutputStream(localFile));
                     log.info(String.format("Downloading of file %s to %s completed successfully", remoteUrl, localFile.getAbsolutePath()));
                     return localFile;
                 } else {
@@ -141,7 +140,7 @@ public class Download extends Task<File> {
                 ArrayList<String> al = new ArrayList<>();
                 al.add("<!doctype html>");
                 al.add(writer.getBuffer().toString());
-                Files.write(localFile.toPath(), al);
+                FileUtils.write(localFile, al);
                 return localFile;
             } else if (type == DownloadResult.COMPLETE) {
                 File dir = localFile.getParentFile();
@@ -167,14 +166,11 @@ public class Download extends Task<File> {
                                 }
                             }
                             if (filename != null) {
-                                try {
-                                    File temp = new File(files.getAbsolutePath() + File.separator + filename);
-                                    Files.copy(stream, temp.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                                    ((Element) nodeList.item(i)).setAttribute("src", "files/" + temp.getName());
-                                    if (((Element) nodeList.item(i)).getAttribute("srcset") != null) {
-                                        ((Element) nodeList.item(i)).setAttribute("srcset", "files/" + temp.getName());
-                                    }
-                                } catch (IOException | DOMException e) {
+                                File temp = new File(files.getAbsolutePath() + File.separator + filename);
+                                FileUtils.copy(stream, new FileOutputStream(temp));
+                                ((Element) nodeList.item(i)).setAttribute("src", "files/" + temp.getName());
+                                if (((Element) nodeList.item(i)).getAttribute("srcset") != null) {
+                                    ((Element) nodeList.item(i)).setAttribute("srcset", "files/" + temp.getName());
                                 }
                             }
                         } else {
@@ -194,7 +190,7 @@ public class Download extends Task<File> {
                 ArrayList<String> al = new ArrayList<>();
                 al.add("<!doctype html>");
                 al.add(writer.getBuffer().toString());
-                Files.write(localFile.toPath(), al);
+                FileUtils.write(localFile, al);
 
                 return localFile;
             }

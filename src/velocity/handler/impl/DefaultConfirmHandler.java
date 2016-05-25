@@ -9,6 +9,7 @@ import java.util.Optional;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import velocity.core.VelocityCore;
 import velocity.core.VelocityEngine;
 import velocity.handler.ConfirmHandler;
 
@@ -24,18 +25,26 @@ public class DefaultConfirmHandler extends DefaultHandler implements ConfirmHand
 
     @Override
     public Boolean call(String param) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmation");
-        alert.setHeaderText(param);
-        alert.initOwner(getEngine().getVelocityView().getScene() == null ? null : getEngine().getVelocityView().getScene().getWindow());
-        CheckBox box = new CheckBox("Stop showing any more dialogs");
-        box.selectedProperty().addListener((ob, older, newer) -> {
-            getEngine().setDialogsSuppressed(newer);
-        });
-        alert.getDialogPane().setExpandableContent(box);
-        alert.getDialogPane().setExpanded(true);
-        Optional<ButtonType> result = alert.showAndWait();
-        return result.get() == ButtonType.OK;
+        if (VelocityCore.isDesktop()) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirmation");
+            alert.setHeaderText(param);
+            alert.initOwner(getEngine().getVelocityView().getScene() == null ? null : getEngine().getVelocityView().getScene().getWindow());
+            CheckBox box = new CheckBox("Stop showing any more dialogs");
+            box.selectedProperty().addListener((ob, older, newer) -> {
+                getEngine().setDialogsSuppressed(newer);
+            });
+            alert.getDialogPane().setExpandableContent(box);
+            alert.getDialogPane().setExpanded(true);
+            Optional<ButtonType> result = alert.showAndWait();
+            return result.get() == ButtonType.OK;
+        } else {
+            com.gluonhq.charm.glisten.control.Alert alert = new com.gluonhq.charm.glisten.control.Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitleText("Confirmation");
+            alert.setContentText(param);
+            Optional<ButtonType> result = alert.showAndWait();
+            return result.get() == ButtonType.OK;
+        }
     }
 
 }

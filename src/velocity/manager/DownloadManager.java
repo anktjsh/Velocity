@@ -6,13 +6,11 @@
 package velocity.manager;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import velocity.core.Download;
+import velocity.util.FileUtils;
 
 /**
  *
@@ -69,18 +67,12 @@ public class DownloadManager {
         for (Download we : downloads) {
             al.add(we.getRemoteUrl() + "," + we.getLocalFile().getAbsolutePath());
         }
-        try {
-            Files.write(Paths.get("downloads.txt"), al);
-        } catch (IOException ex) {
-        }
+        FileUtils.write(new File("downloads.txt"), al);
     }
 
     public void load() {
         ArrayList<String> al = new ArrayList<>();
-        try {
-            al.addAll(Files.readAllLines(Paths.get("downloads.txt")));
-        } catch (IOException ex) {
-        }
+        al.addAll(FileUtils.readAllLines(new File("downloads.txt")));
         for (String s : al) {
             String[] spl = s.split(",");
             if (spl.length == 2) {

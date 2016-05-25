@@ -5,13 +5,12 @@
  */
 package velocity.manager;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.TreeMap;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
+import velocity.util.FileUtils;
 
 /**
  *
@@ -47,10 +46,7 @@ public class FavoritesManager {
 
     public void load() {
         ArrayList<String> al = new ArrayList<>();
-        try {
-            al.addAll(Files.readAllLines(Paths.get("favorites.txt")));
-        } catch (IOException e) {
-        }
+        al.addAll(FileUtils.readAllLines(new File("favorites.txt")));
         for (String s : al) {
             String spl[] = s.split(",");
             favorites.put(spl[0], spl[1]);
@@ -62,9 +58,6 @@ public class FavoritesManager {
         for (String s : favorites.keySet()) {
             al.add(s + "," + favorites.get(s));
         }
-        try {
-            Files.write(Paths.get("favorites.txt"), al);
-        } catch (IOException e) {
-        }
+        FileUtils.write(new File("favorites.txt"), al);
     }
 }

@@ -24,6 +24,7 @@ import velocity.core.VelocityCore;
 import velocity.core.VelocityCore.FileLaunchStatus;
 import velocity.core.VelocityEngine;
 import velocity.manager.DownloadManager;
+import velocity.util.DialogUtils;
 
 /**
  *
@@ -72,11 +73,7 @@ public class DownloadsView extends BorderPane {
         });
         search.setOnAction(field.getOnAction());
         clear.setOnAction((e) -> {
-            Alert al = new Alert(Alert.AlertType.CONFIRMATION);
-            al.setTitle("Confirm");
-            al.setHeaderText("Are you sure you want to clear these entries?");
-            al.initOwner(getScene() == null ? null : getScene().getWindow());
-            Optional<ButtonType> show = al.showAndWait();
+            Optional<ButtonType> show = DialogUtils.showAlert(Alert.AlertType.CONFIRMATION, getScene() == null ? null : getScene().getWindow(), "Confirm", "Are you sure you want to clear these entries?", "");
             if (show.isPresent()) {
                 if (show.get() == ButtonType.OK) {
                     DownloadManager.getInstance().clear();

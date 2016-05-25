@@ -5,9 +5,9 @@
  */
 package application.velocity;
 
+import application.features.FavoritesBar;
 import application.features.StatusBar;
 import application.features.ZoomMenuItem;
-import application.features.FavoritesBar;
 import application.velocity.BrowserPane.AddTab;
 import application.view.DownloadsView;
 import application.view.HistoryPane;
@@ -27,7 +27,6 @@ import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.print.Printer;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -51,8 +50,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.web.PopupFeatures;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Stage;
-import javafx.stage.Window;
 import javafx.util.Pair;
 import velocity.core.VelocityCore;
 import velocity.core.VelocityEngine;
@@ -64,6 +61,9 @@ import velocity.handler.PrintStatus;
 import velocity.handler.SaveHandler;
 import velocity.handler.VelocityListener;
 import velocity.manager.FavoritesManager;
+import velocity.util.DialogUtils;
+import velocity.view.GlistenChoiceDialog;
+import velocity.view.GlistenDoubleInputDialog;
 import velocity.view.Viewer;
 
 /**
@@ -89,7 +89,9 @@ public class BrowserView extends Tab implements Serializable {
 
     public BrowserView(String url) {
         view = new VelocityView();
-        view.getEngine().enableJavaScript();
+        if (VelocityCore.isDesktop()) {
+            view.getEngine().enableJavaScript();
+        }
         menu = new ContextMenu();
         setContextMenu(menu);
         menu.getItems().addAll(new MenuItem("New Tab"),
@@ -236,30 +238,58 @@ public class BrowserView extends Tab implements Serializable {
             return bv.view.getEngine();
         });
         view.getEngine().setPrintHandler((job) -> {
-            List<String> choices = new ArrayList<>();
-            for (Printer p : Printer.getAllPrinters()) {
-                choices.add(p.getName());
-            }
-            ChoiceDialog<String> printer = new ChoiceDialog<>(Printer.getDefaultPrinter().getName(), choices);
-            printer.setTitle("Printer Selection");
-            printer.setHeaderText("Select a Printer");
-            printer.initOwner(getTabPane().getScene().getWindow());
-            Optional<String> show = printer.showAndWait();
-            if (show.isPresent()) {
-                Printer select = null;
+            if (VelocityCore.isDesktop()) {
+                List<String> choices = new ArrayList<>();
                 for (Printer p : Printer.getAllPrinters()) {
-                    if (p.getName().equals(show.get())) {
-                        select = p;
-                    }
+                    choices.add(p.getName());
                 }
-                if (select != null) {
-                    job.setPrinter(select);
-                    return PrintStatus.CONTINUE;
+                ChoiceDialog<String> printer = new ChoiceDialog<>(Printer.getDefaultPrinter().getName(), choices);
+                printer.setTitle("Printer Selection");
+                printer.setHeaderText("Select a Printer");
+                printer.initOwner(getTabPane().getScene().getWindow());
+                Optional<String> show = printer.showAndWait();
+                if (show.isPresent()) {
+                    Printer select = null;
+                    for (Printer p : Printer.getAllPrinters()) {
+                        if (p.getName().equals(show.get())) {
+                            select = p;
+                        }
+                    }
+                    if (select != null) {
+                        job.setPrinter(select);
+                        return PrintStatus.CONTINUE;
+                    } else {
+                        return PrintStatus.CANCEL;
+                    }
                 } else {
                     return PrintStatus.CANCEL;
                 }
             } else {
-                return PrintStatus.CANCEL;
+                GlistenChoiceDialog printer = new GlistenChoiceDialog();
+                List<String> choices = new ArrayList<>();
+                for (Printer p : Printer.getAllPrinters()) {
+                    choices.add(p.getName());
+                }
+                printer.setItems(choices);
+                printer.setSelectedValue(Printer.getDefaultPrinter().getName());
+                printer.setTitle("Select a Printer");
+                Optional<String> show = printer.showAndWait();
+                if (show.isPresent()) {
+                    Printer select = null;
+                    for (Printer p : Printer.getAllPrinters()) {
+                        if (p.getName().equals(show.get())) {
+                            select = p;
+                        }
+                    }
+                    if (select != null) {
+                        job.setPrinter(select);
+                        return PrintStatus.CONTINUE;
+                    } else {
+                        return PrintStatus.CANCEL;
+                    }
+                } else {
+                    return PrintStatus.CANCEL;
+                }
             }
         });
         view.getEngine().setPopupHandler(new PopupHandler() {
@@ -338,67 +368,71 @@ public class BrowserView extends Tab implements Serializable {
         favorite.setGraphic(VelocityCore.isDesktop() ? new ImageView(new Image(getClass().getResourceAsStream("star.png"), 20, 20, true, true)) : MaterialDesignIcon.STAR.graphic());
         favorite.setOnAction((e) -> {
             if (view.getEngine().getDocument() != null) {
-                Dialog<Pair<String, String>> input = new Dialog<>();
-                input.setTitle("Favorites Item");
-                input.setHeaderText("What would you like to save this link as?");
-                input.initOwner(getTabPane().getScene().getWindow());
-
-                ButtonType loginButtonType = new ButtonType("Confirm", ButtonData.OK_DONE);
-                input.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
-
-                GridPane grid = new GridPane();
-                grid.setHgap(10);
-                grid.setVgap(10);
-                grid.setPadding(new Insets(20, 150, 10, 10));
-
-                TextField username = new TextField();
-                username.setPromptText("Name");
-                TextField password = new TextField();
-                password.setPromptText("URL");
-                password.setEditable(false);
-                password.setText(view.getEngine().getLocation());
-
-                grid.add(new Label("Website Name:"), 0, 0);
-                grid.add(username, 1, 0);
-                grid.add(new Label("Website URL:"), 0, 1);
-                grid.add(password, 1, 1);
-
-                Node loginButton = input.getDialogPane().lookupButton(loginButtonType);
-                loginButton.setDisable(true);
-
-                username.textProperty().addListener((observable, oldValue, newValue) -> {
-                    loginButton.setDisable(newValue.trim().isEmpty());
-                });
-
-                username.setText(view.getEngine().getTitle());
-
-                input.getDialogPane().setContent(grid);
-
-                Platform.runLater(() -> username.requestFocus());
-
-                input.setResultConverter(dialogButton -> {
-                    if (dialogButton == loginButtonType) {
-                        return new Pair<>(username.getText(), password.getText());
-                    }
-                    return null;
-                });
-                Optional<Pair<String, String>> result = input.showAndWait();
-                result.ifPresent(res -> {
-                    boolean b = FavoritesManager.getInstance().add(res.getKey(), res.getValue());
-                    if (!b) {
-                        Alert al = new Alert(AlertType.ERROR);
-                        al.initOwner(getTabPane().getScene().getWindow());
-                        al.setTitle("Favorites");
-                        al.setHeaderText("Favorite already exists!");
-                        al.showAndWait();
-                    } else {
-                        Alert al = new Alert(AlertType.INFORMATION);
-                        al.initOwner(getTabPane().getScene().getWindow());
-                        al.setTitle("Favorites");
-                        al.setHeaderText("Favorite added successfully!");
-                        al.showAndWait();
-                    }
-                });
+                if (VelocityCore.isDesktop()) {
+                    Dialog<Pair<String, String>> input = new Dialog<>();
+                    input.setTitle("Favorites Item");
+                    input.setHeaderText("What would you like to save this link as?");
+                    input.initOwner(getTabPane().getScene().getWindow());
+                    ButtonType loginButtonType = new ButtonType("Confirm", ButtonData.OK_DONE);
+                    input.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+                    GridPane grid = new GridPane();
+                    grid.setHgap(10);
+                    grid.setVgap(10);
+                    grid.setPadding(new Insets(20, 150, 10, 10));
+                    TextField username = new TextField();
+                    username.setPromptText("Name");
+                    TextField password = new TextField();
+                    password.setPromptText("URL");
+                    password.setEditable(false);
+                    password.setText(view.getEngine().getLocation());
+                    grid.add(new Label("Website Name:"), 0, 0);
+                    grid.add(username, 1, 0);
+                    grid.add(new Label("Website URL:"), 0, 1);
+                    grid.add(password, 1, 1);
+                    Node loginButton = input.getDialogPane().lookupButton(loginButtonType);
+                    loginButton.setDisable(true);
+                    username.textProperty().addListener((observable, oldValue, newValue) -> {
+                        loginButton.setDisable(newValue.trim().isEmpty());
+                    });
+                    username.setText(view.getEngine().getTitle());
+                    input.getDialogPane().setContent(grid);
+                    Platform.runLater(() -> username.requestFocus());
+                    input.setResultConverter(dialogButton -> {
+                        if (dialogButton == loginButtonType) {
+                            return new Pair<>(username.getText(), password.getText());
+                        }
+                        return null;
+                    });
+                    Optional<Pair<String, String>> result = input.showAndWait();
+                    result.ifPresent(res -> {
+                        boolean b = FavoritesManager.getInstance().add(res.getKey(), res.getValue());
+                        if (!b) {
+                            DialogUtils.showAlert(AlertType.ERROR, getTabPane().getScene().getWindow(), "Favorites", "Favorite already exists!", "");
+                        } else {
+                            DialogUtils.showAlert(AlertType.INFORMATION, getTabPane().getScene().getWindow(), "Favorites", "Favorite added successfully", "");
+                        }
+                    });
+                } else {
+                    GlistenDoubleInputDialog input = new GlistenDoubleInputDialog();
+                    input.setTitle("Favorites Item");
+                    input.keyField().setPromptText("Name");
+                    input.valueField().setText(view.getEngine().getLocation());
+                    input.valueField().setPromptText("URL");
+                    input.getConfirmButton().setDisable(true);
+                    input.keyField().textProperty().addListener((observable, oldValue, newValue) -> {
+                        input.getConfirmButton().setDisable(newValue.trim().isEmpty());
+                    });
+                    input.keyField().setText(view.getEngine().getTitle());
+                    Optional<Pair<String, String>> result = input.showAndWait();
+                    result.ifPresent(res -> {
+                        boolean b = FavoritesManager.getInstance().add(res.getKey(), res.getValue());
+                        if (!b) {
+                            DialogUtils.showAlert(AlertType.ERROR, getTabPane().getScene().getWindow(), "Favorites", "Favorite already exists!", "");
+                        } else {
+                            DialogUtils.showAlert(AlertType.INFORMATION, getTabPane().getScene().getWindow(), "Favorites", "Favorite added successfully", "");
+                        }
+                    });
+                }
             }
         });
         options.getItems().addAll(new MenuItem("New Tab\t\tCtrl+T"),
@@ -429,9 +463,11 @@ public class BrowserView extends Tab implements Serializable {
             settings();
         });
         options.getItems().get(7).setOnAction((e) -> {
-            showAlert(AlertType.INFORMATION, getTabPane().getScene().getWindow(),
+            DialogUtils.showAlert(AlertType.INFORMATION, getTabPane().getScene().getWindow(),
                     "Velocity Information",
-                    "Velocity v1.0.0", "Created by Aniket Joshi");
+                    VelocityCore.isDesktop()
+                            ? "Velocity v1.0.0" : "Velocity v1.0.0\nCreated by Aniket Joshi",
+                    VelocityCore.isDesktop() ? "Created by Aniket Joshi" : "");
         });
         options.getItems().get(8).setOnAction((e) -> {
             exit();
@@ -453,8 +489,9 @@ public class BrowserView extends Tab implements Serializable {
                 }
             }
         });
-        view.getEngine().setUserAgent(view.getEngine().getUserAgent() + " Chrome/50.0.2661.94");
-        view.getEngine().enableJavaScript();
+        if (VelocityCore.isDesktop()) {
+            view.getEngine().setUserAgent(view.getEngine().getUserAgent() + " Chrome/50.0.2661.94");
+        }
         view.getEngine().setProgressListener((double progress) -> {
             t.setText((progress * 100) + "%");
             if (progress == 1) {
@@ -498,11 +535,7 @@ public class BrowserView extends Tab implements Serializable {
                 if (lastTyped != null) {
                     view.getEngine().load("https://www.google.com/search?q=" + lastTyped + "&oq=" + lastTyped + "&aqs=chrome..69i57j0l2j69i65j0l2.1918j0j7&sourceid=chrome&ie=UTF-8");
                 } else {
-                    Alert al = new Alert(AlertType.WARNING);
-                    al.initOwner(getTabPane() != null ? getTabPane().getScene().getWindow() : null);
-                    al.setTitle("Internet");
-                    al.setHeaderText("You are not connected to the internet!");
-                    al.showAndWait();
+                    DialogUtils.showAlert(AlertType.WARNING, getTabPane() != null ? getTabPane().getScene().getWindow() : null, "Internet", "You are not connected to the internet!", "");
                 }
             }
 
@@ -578,15 +611,4 @@ public class BrowserView extends Tab implements Serializable {
         return view.getEngine();
     }
 
-    public static Optional<ButtonType> showAlert(Alert.AlertType al, Window w, String title, String head, String cont) {
-        Alert ale = new Alert(al);
-        ale.initOwner(w);
-        ale.setTitle(title);
-        ale.setHeaderText(head);
-        ale.setContentText(cont);
-        if (((Stage) ale.getDialogPane().getScene().getWindow()).getIcons().isEmpty()) {
-            ((Stage) ale.getDialogPane().getScene().getWindow()).getIcons().add(Desktop.web);
-        }
-        return ale.showAndWait();
-    }
 }

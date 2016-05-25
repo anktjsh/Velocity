@@ -9,8 +9,10 @@ import java.util.Optional;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.web.PromptData;
+import velocity.core.VelocityCore;
 import velocity.core.VelocityEngine;
 import velocity.handler.PromptHandler;
+import velocity.view.GlistenInputDialog;
 
 /**
  *
@@ -24,19 +26,28 @@ public class DefaultPromptHandler extends DefaultHandler implements PromptHandle
 
     @Override
     public String call(PromptData param) {
-        TextInputDialog dialog = new TextInputDialog(param.getDefaultValue());
-        dialog.setTitle("Prompt");
-        dialog.initOwner(getEngine().getVelocityView().getScene() == null ? null : getEngine().getVelocityView().getScene().getWindow());
-        dialog.setHeaderText(param.getMessage());
-        CheckBox box = new CheckBox("Stop showing any more dialogs");
-        box.selectedProperty().addListener((ob, older, newer) -> {
-            getEngine().setDialogsSuppressed(newer);
-        });
-        dialog.getDialogPane().setExpandableContent(box);
-        dialog.getDialogPane().setExpanded(true);
-        Optional<String> result = dialog.showAndWait();
-        if (result.isPresent()) {
-            return result.get();
+        if (VelocityCore.isDesktop()) {
+            TextInputDialog dialog = new TextInputDialog(param.getDefaultValue());
+            dialog.setTitle("Prompt");
+            dialog.initOwner(getEngine().getVelocityView().getScene() == null ? null : getEngine().getVelocityView().getScene().getWindow());
+            dialog.setHeaderText(param.getMessage());
+            CheckBox box = new CheckBox("Stop showing any more dialogs");
+            box.selectedProperty().addListener((ob, older, newer) -> {
+                getEngine().setDialogsSuppressed(newer);
+            });
+            dialog.getDialogPane().setExpandableContent(box);
+            dialog.getDialogPane().setExpanded(true);
+            Optional<String> result = dialog.showAndWait();
+            if (result.isPresent()) {
+                return result.get();
+            }
+        } else {
+            GlistenInputDialog dialog = new GlistenInputDialog();
+            dialog.setTitle("Prompt");
+            Optional<String> result = dialog.showAndWait();
+            if (result.isPresent()) {
+                return result.get();
+            }
         }
         return "";
     }

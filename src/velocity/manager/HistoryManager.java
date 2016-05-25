@@ -5,9 +5,7 @@
  */
 package velocity.manager;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.File;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -23,6 +21,7 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebHistory.Entry;
 import javafx.util.Pair;
+import velocity.util.FileUtils;
 
 /**
  *
@@ -202,18 +201,12 @@ public class HistoryManager {
         for (WebEntry we : entries) {
             al.add(we.toString());
         }
-        try {
-            Files.write(Paths.get("history.txt"), al);
-        } catch (IOException ex) {
-        }
+        FileUtils.write(new File("history.txt"), al);
     }
 
     public void load() {
         ArrayList<String> al = new ArrayList<>();
-        try {
-            al.addAll(Files.readAllLines(Paths.get("history.txt")));
-        } catch (IOException ex) {
-        }
+        al.addAll(FileUtils.readAllLines(new File("history.txt")));
         for (String s : al) {
             String[] spl = s.split(",");
             if (spl.length == 4) {
