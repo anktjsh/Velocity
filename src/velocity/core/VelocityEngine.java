@@ -7,6 +7,7 @@ package velocity.core;
 
 import com.sun.javafx.scene.control.skin.ContextMenuContent;
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -61,6 +62,7 @@ import velocity.handler.impl.DefaultViewSourceHandler;
 import velocity.manager.DownloadManager;
 import velocity.manager.HistoryManager;
 import velocity.manager.HistoryManager.WebEntry;
+import velocity.view.PdfReader;
 
 /**
  *
@@ -179,8 +181,8 @@ public final class VelocityEngine {
                 } else if (newer.endsWith(".pdf")) {
                     view.setCenter(null);
                     File f;
-//                    view.setCenter(new PdfReader(f = new File(URI.create(newer))));
-//                    titleProperty.set(f.getName());
+                    view.setCenter(new PdfReader(f = new File(URI.create(newer))));
+                    titleProperty.set(f.getName());
                 } else if (!(view.getCenter() instanceof WebView)) {
                     view.setCenter(web);
                 }

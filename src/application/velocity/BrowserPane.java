@@ -132,7 +132,9 @@ public class BrowserPane extends BorderPane {
                 if (ewer) {
                     int index = getTabPane().getTabs().indexOf(AddTab.this);
                     if (index == 0) {
-                        Desktop.close(BrowserPane.this);
+                        if (VelocityCore.isDesktop()) {
+                            Desktop.close(BrowserPane.this);
+                        }
                     }
                     application.velocity.BrowserView bv;
                     getTabPane().getTabs().add(index, bv = new BrowserView(""));

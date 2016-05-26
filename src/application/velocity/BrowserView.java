@@ -549,17 +549,22 @@ public class BrowserView extends Tab implements Serializable {
         });
         field.setOnAction((e) -> {
             (new Thread(() -> {
-                String s = field.getText();
-                lastTyped = s;
-                if (s.contains(" ")) {
+                if (field.getText().equals(view.getEngine().getLocation())) {
                     Platform.runLater(()
-                            -> view.getEngine().load("https://www.google.com/search?q=" + s + "&oq=" + s + "&aqs=chrome..69i57j0l2j69i65j0l2.1918j0j7&sourceid=chrome&ie=UTF-8"));
+                            -> load(field.getText()));
                 } else {
+                    String s = field.getText();
+                    lastTyped = s;
+                    if (s.contains(" ")) {
+                        Platform.runLater(()
+                                -> view.getEngine().load("https://www.google.com/search?q=" + s + "&oq=" + s + "&aqs=chrome..69i57j0l2j69i65j0l2.1918j0j7&sourceid=chrome&ie=UTF-8"));
+                    } else {
+                        Platform.runLater(()
+                                -> load(s));
+                    }
                     Platform.runLater(()
-                            -> load(s));
+                            -> field.getParent().requestFocus());
                 }
-                Platform.runLater(()
-                        -> field.getParent().requestFocus());
             })).start();
         });
         setOnClosed((E) -> {
