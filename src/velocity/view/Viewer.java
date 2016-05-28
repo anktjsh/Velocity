@@ -6,13 +6,12 @@
 package velocity.view;
 
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.BorderPane;
 
 /**
  *
  * @author Aniket
  */
-public class Viewer extends BorderPane {
+public class Viewer extends CustomTab {
 
     private final TextArea area;
 

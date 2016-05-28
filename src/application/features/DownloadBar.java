@@ -9,8 +9,8 @@ import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import velocity.core.Download;
 import velocity.handler.PopupHandler;
 import velocity.manager.DownloadManager;
@@ -21,13 +21,14 @@ import velocity.manager.DownloadManager;
  */
 public class DownloadBar extends BorderPane {
 
-    private final ToolBar bar;
+    private final HBox bar;
     private final Button close;
     PopupHandler handler;
 
     public DownloadBar() {
         setPadding(new Insets(5, 10, 5, 10));
-        bar = new ToolBar();
+        bar = new HBox(5);
+        bar.setPadding(new Insets(5));
         close = new Button("X");
         close.setStyle(
                 "-fx-background-radius: 5em; "
@@ -41,11 +42,11 @@ public class DownloadBar extends BorderPane {
             setRight(null);
         });
         DownloadManager.getInstance().setDownloadListener((Download d) -> {
-            bar.getItems().add(new DownloadItem(d, bar, this));
+            bar.getChildren().add(new DownloadItem(d, bar, this));
             setCenter(bar);
             setRight(close);
         });
-        bar.getItems().addListener((ListChangeListener.Change<? extends Node> c) -> {
+        bar.getChildren().addListener((ListChangeListener.Change<? extends Node> c) -> {
             c.next();
             if (c.getList().isEmpty()) {
                 close.fire();

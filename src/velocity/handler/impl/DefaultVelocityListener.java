@@ -5,10 +5,9 @@
  */
 package velocity.handler.impl;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.scene.Node;
 import velocity.core.VelocityEngine;
 import velocity.handler.VelocityListener;
+import velocity.view.CustomTab;
 
 /**
  *
@@ -21,23 +20,28 @@ public class DefaultVelocityListener extends DefaultHandler implements VelocityL
     }
 
     @Override
-    public void showDownloads(ObjectProperty<Node> node, String url) {
+    public CustomTab showDownloads(String url) {
+        return null;
     }
 
     @Override
-    public void showHistory(ObjectProperty<Node> node, String url) {
+    public CustomTab showHistory(String url) {
+        return null;
     }
 
     @Override
-    public void showPageSource(ObjectProperty<Node> node, String url, String text) {
+    public CustomTab showSettings(String url) {
+        return null;
     }
 
     @Override
-    public void showSettings(ObjectProperty<Node> node, String url) {
+    public CustomTab showPageSource(String url, String text) {
+        return null;
     }
 
     @Override
-    public void startPage(ObjectProperty<Node> node) {
+    public CustomTab startPage() {
+        return null;
     }
 
 }

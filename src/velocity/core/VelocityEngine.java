@@ -93,6 +93,7 @@ public final class VelocityEngine {
     private final ReadOnlyBooleanWrapper canGoBackProperty = new ReadOnlyBooleanWrapper();
     private final BooleanProperty dialogsSuppressed = new SimpleBooleanProperty();
     private final BooleanProperty popupsSuppressed = new SimpleBooleanProperty();
+    private final BooleanProperty incognitoProperty =new SimpleBooleanProperty();
 
     private boolean isImage;
     private String srcUrl;
@@ -141,19 +142,19 @@ public final class VelocityEngine {
                     view.setCenter(null);
                     titleProperty.set("Downloads");
                     if (getVelocityListener() != null) {
-                        getVelocityListener().showDownloads(view.centerProperty(), newer);
+                        view.setCenter(getVelocityListener().showDownloads(newer));
                     }
                 } else if (newer.equals("velocityfx://history")) {
                     view.setCenter(null);
                     titleProperty.set("History");
                     if (getVelocityListener() != null) {
-                        getVelocityListener().showHistory(view.centerProperty(), newer);
+                        view.setCenter(getVelocityListener().showHistory(newer));
                     }
                 } else if (newer.startsWith("velocityfx://settings")) {
                     view.setCenter(null);
                     titleProperty.set("Settings");
                     if (getVelocityListener() != null) {
-                        getVelocityListener().showSettings(view.centerProperty(), newer);
+                        view.setCenter(getVelocityListener().showSettings(newer));
                     }
                 } else if (newer.startsWith("velocityfx://source-")) {
                     if (newer.contains("\t")) {
@@ -161,7 +162,7 @@ public final class VelocityEngine {
                         view.setCenter(null);
                         titleProperty.set("View Source");
                         if (getVelocityListener() != null) {
-                            getVelocityListener().showPageSource(view.centerProperty(), spl[0] + spl[1], spl[2]);
+                            view.setCenter(getVelocityListener().showPageSource(spl[0] + spl[1], spl[2]));
                         }
                         locationProperty.set(spl[0] + spl[1]);
                     }
@@ -169,7 +170,7 @@ public final class VelocityEngine {
                     titleProperty.set("New Tab");
                     view.setCenter(null);
                     if (getVelocityListener() != null) {
-                        getVelocityListener().startPage(view.centerProperty());
+                        view.setCenter(getVelocityListener().startPage());
                     }
                 } else if (contentType != null && contentType.startsWith("application/")) {
                     if (getSaveHandler() != null) {
@@ -318,6 +319,30 @@ public final class VelocityEngine {
         setPopupHandler(new DefaultPopupHandler(this));
         setConfirmHandler(new DefaultConfirmHandler(this));
         setVelocityListener(new DefaultVelocityListener(this));
+        incognitoProperty.set(false);
+        incognitoProperty.addListener((ob, older, newer )-> {
+            if (newer) {
+                if (!older){
+                    HistoryManager.getInstance().removeEngine(web.getEngine());
+                }
+            } else {
+                if (older) {
+                    HistoryManager.getInstance().removeEngine(web.getEngine());
+                }
+            }
+        });
+    }
+    
+    public boolean isIncognito() {
+        return incognitoProperty.get();
+    }
+    
+    public BooleanProperty incognitoProperty() {
+        return incognitoProperty;
+    }
+
+    public void setIncognito(boolean b) {
+        incognitoProperty.set(b);
     }
 
     public void launchPopup(String url) {

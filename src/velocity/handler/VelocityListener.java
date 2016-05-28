@@ -5,8 +5,7 @@
  */
 package velocity.handler;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.scene.Node;
+import velocity.view.CustomTab;
 
 /**
  *
@@ -14,13 +13,13 @@ import javafx.scene.Node;
  */
 public interface VelocityListener {
 
-    public void showDownloads(ObjectProperty<Node> node, String url);
+    public CustomTab showDownloads(String url);
 
-    public void showHistory(ObjectProperty<Node> node, String url);
+    public CustomTab showHistory(String url);
 
-    public void showSettings(ObjectProperty<Node> node, String url);
+    public CustomTab showSettings(String url);
 
-    public void showPageSource(ObjectProperty<Node> node, String url, String text);
+    public CustomTab showPageSource(String url, String text);
 
-    public void startPage(ObjectProperty<Node> node);
+    public CustomTab startPage();
 }

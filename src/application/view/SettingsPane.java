@@ -27,12 +27,13 @@ import velocity.cookie.Cookie;
 import velocity.core.VelocityCore;
 import velocity.core.VelocityEngine;
 import velocity.manager.SettingsManager;
+import velocity.view.CustomTab;
 
 /**
  *
  * @author Aniket
  */
-public class SettingsPane extends BorderPane {
+public class SettingsPane extends CustomTab {
 
     private final Label title;
     private final VBox box;
@@ -46,8 +47,26 @@ public class SettingsPane extends BorderPane {
     private final ListView<Cookie> cookieView;
     private final HBox cookieBox;
     private final Button removeCookie;
+    private final SettingsManager.SettingsListener listener;
+
+    @Override
+    public void close() {
+        SettingsManager.removeSettingsListener(listener);
+    }
 
     public SettingsPane(VelocityEngine engine) {
+        if (!Boolean.parseBoolean(SettingsManager.getProperty("darkTheme"))) {
+            setStyle("-fx-background-color:white;");
+        }
+        SettingsManager.addSettingsListener(listener = (settingsKey, oldValue, newValue) -> {
+            if (settingsKey.equals("darkTheme")) {
+                if (Boolean.parseBoolean(newValue)) {
+                    setStyle("");
+                } else {
+                    setStyle("-fx-background-color:white;");
+                }
+            }
+        });
         setPadding(new Insets(5, 10, 5, 10));
         setTop(title = new Label("Settings"));
         title.setFont(new Font(18));

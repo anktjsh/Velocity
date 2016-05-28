@@ -9,22 +9,41 @@ import java.util.ArrayList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 import velocity.core.VelocityEngine;
 import velocity.manager.HistoryManager;
+import velocity.manager.SettingsManager;
+import velocity.view.CustomTab;
 
 /**
  *
  * @author Aniket
  */
-public class StartPage extends BorderPane {
+public class StartPage extends CustomTab {
 
     private final GridPane grid;
     private final VelocityEngine engine;
+    private final SettingsManager.SettingsListener listener;
+
+    @Override
+    public void close() {
+        SettingsManager.removeSettingsListener(listener);
+    }
 
     public StartPage(VelocityEngine engine) {
+        if (!Boolean.parseBoolean(SettingsManager.getProperty("darkTheme"))) {
+            setStyle("-fx-background-color:white;");
+        }
+        SettingsManager.addSettingsListener(listener = (settingsKey, oldValue, newValue) -> {
+            if (settingsKey.equals("darkTheme")) {
+                if (Boolean.parseBoolean(newValue)) {
+                    setStyle("");
+                } else {
+                    setStyle("-fx-background-color:white;");
+                }
+            }
+        });
         this.engine = engine;
         grid = new GridPane();
         grid.setHgap(10);

@@ -15,7 +15,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
@@ -24,32 +23,54 @@ import velocity.core.VelocityCore;
 import velocity.core.VelocityCore.FileLaunchStatus;
 import velocity.core.VelocityEngine;
 import velocity.manager.DownloadManager;
+import velocity.manager.SettingsManager;
+import velocity.manager.SettingsManager.SettingsListener;
 import velocity.util.DialogUtils;
+import velocity.view.CustomTab;
 
 /**
  *
  * @author Aniket
  */
-public class DownloadsView extends BorderPane {
+public class DownloadsView extends CustomTab {
 
     private final ArrayList<Download> allEntries;
     private final ListView<Download> view;
     private final VelocityEngine engine;
     private final BorderPane top;
-    private final ToolBar searchBar;
+    private final HBox searchBar;
     private final Button search, clear;
     private final TextField field;
+    private final SettingsListener listener;
+
+    @Override
+    public void close() {
+        SettingsManager.removeSettingsListener(listener);
+    }
 
     public DownloadsView(VelocityEngine engine) {
+        if (!Boolean.parseBoolean(SettingsManager.getProperty("darkTheme"))) {
+            setStyle("-fx-background-color:white;");
+        }
+        SettingsManager.addSettingsListener(listener = (settingsKey, oldValue, newValue) -> {
+            if (settingsKey.equals("darkTheme")) {
+                if (Boolean.parseBoolean(newValue)) {
+                    setStyle("");
+                } else {
+                    setStyle("-fx-background-color:white;");
+                }
+            }
+        });
         this.engine = engine;
         setPadding(new Insets(5, 10, 5, 10));
         view = new ListView<>();
         setTop(top = new BorderPane());
         Label ll;
         top.setTop(ll = new Label("Downloads"));
-        top.setRight(searchBar = new ToolBar());
-        searchBar.getItems().add(clear = new Button("Clear Downloads"));
-        searchBar.getItems().addAll(field = new TextField(), search = new Button("Search"));
+        top.setRight(searchBar = new HBox(5));
+        searchBar.setPadding(new Insets(5));
+        searchBar.getChildren().add(clear = new Button("Clear Downloads"));
+        searchBar.getChildren().addAll(field = new TextField(), search = new Button("Search"));
         ll.setFont(new Font(18));
         setCenter(view);
         view.setCellFactory((param) -> new DownloadsCell());

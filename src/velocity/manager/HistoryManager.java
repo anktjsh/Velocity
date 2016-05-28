@@ -55,14 +55,18 @@ public class HistoryManager {
     private static final ArrayList<WebEntry> entries = new ArrayList<>();
     private static final ArrayList<Website> frequency = new ArrayList<>();
     private static final HashMap<WebEngine, List<WebEntry>> map = new HashMap<>();
+    private static final HashMap<WebEngine, HistoryChangeListener> listen = new HashMap<>();
 
-    private HistoryManager() {
-    }
+    private class HistoryChangeListener implements ListChangeListener<Entry> {
 
-    public void addEngine(WebEngine web) {
-        map.put(web, new ArrayList<>());
-        addAllEntries(web.getHistory().getEntries(), map.get(web));
-        web.getHistory().getEntries().addListener((ListChangeListener.Change<? extends Entry> c) -> {
+        private final WebEngine web;
+
+        public HistoryChangeListener(WebEngine eng) {
+            web = eng;
+        }
+
+        @Override
+        public void onChanged(Change<? extends Entry> c) {
             c.next();
             if (c.wasAdded()) {
                 for (WebHistory.Entry we : c.getAddedSubList()) {
@@ -74,10 +78,29 @@ public class HistoryManager {
                         frequency.add(site = new Website(w));
                     }
                     site.increment();
-                    map.get(web).add(w);
+                    if (map.containsKey(web)) {
+                        map.get(web).add(w);
+                    }
                 }
             }
-        });
+        }
+
+    }
+
+    private HistoryManager() {
+    }
+
+    public void addEngine(WebEngine web) {
+        map.put(web, new ArrayList<>());
+        addAllEntries(web.getHistory().getEntries(), map.get(web));
+        HistoryChangeListener lis = new HistoryChangeListener(web);
+        listen.put(web, lis);
+        web.getHistory().getEntries().addListener(lis);
+    }
+
+    public void removeEngine(WebEngine web) {
+        map.remove(web);
+        web.getHistory().getEntries().removeListener(listen.remove(web));
     }
 
     public ArrayList<Pair<String, String>> getFrequency() {

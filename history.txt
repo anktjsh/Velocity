@@ -1,26 +1,25 @@
-https://www.google.com/,Google,2016-05-20,13:52:29.958
-https://www.google.com/,Google,2016-05-20,13:55:13.940
-https://www.google.com/,Google,2016-05-20,14:08:25.555
-https://www.google.com/search?q=razer%20blade&oq=razer%20blade&aqs=chrome..69i57j0l2j69i65j0l2.1918j0j7&sourceid=chrome&ie=UTF-8,razer blade - Google Search,2016-05-20,14:08:48.176
-http://www.razerzone.com/store/razer-blade,The New Razer Blade,2016-05-20,14:08:52.250
-http://www.razerzone.com/store/razer-blade#products,The New Razer Blade,2016-05-20,14:09:29.550
-https://www.google.com/,Google,2016-05-23,08:45:21.128
-https://www.google.com/,Google,2016-05-23,08:56:46.043
-https://www.google.com/,Google,2016-05-25,00:49:07.851
-https://www.google.com/,Google,2016-05-25,00:53:31.217
-https://www.google.com/,Google,2016-05-25,07:53:32.506
-https://www.google.com/,Google,2016-05-25,07:55:01.223
-https://www.google.com/,Google,2016-05-25,07:55:47.559
-https://www.google.com/,Google,2016-05-25,07:57:00.634
-https://www.google.com/,Google,2016-05-25,07:57:56.505
-https://www.google.com/,Google,2016-05-25,08:00:41.907
-https://www.google.com/,Google,2016-05-25,08:06:40.104
-https://www.google.com/,Google,2016-05-25,13:22:16.622
-https://www.google.com/,Google,2016-05-25,13:22:39.732
-https://www.google.com/,Google,2016-05-25,13:27:16.330
-https://www.google.com/,Google,2016-05-25,20:19:26.768
-https://www.google.com/,Google,2016-05-25,20:30:12.831
-https://www.google.com/,Google,2016-05-25,20:59:18.267
-https://www.google.com/,Google,2016-05-25,21:08:28.970
-https://www.google.com/,Google,2016-05-25,21:09:07.458
-https://www.google.com/,Google,2016-05-25,21:09:32.170
+https://www.google.com/,Google,2016-05-26,19:26:53.666
+https://www.google.com/,Google,2016-05-26,19:46:49.028
+https://www.google.com/,Google,2016-05-26,19:49:01.631
+https://www.google.com/,Google,2016-05-26,19:52:36.605
+https://www.google.com/,Google,2016-05-26,19:53:47.887
+https://www.google.com/,Google,2016-05-26,19:54:41.770
+https://www.google.com/,Google,2016-05-26,20:18:50.861
+https://www.google.com/#q=what+is+my+user+agent,what is my user agent - Google Search,2016-05-26,20:18:55.806
+http://whatsmyuseragent.com/,What's My User Agent?,2016-05-26,20:18:58.578
+https://www.google.com/,viewcomic - Google Search,2016-05-27,10:20:05.596
+https://www.google.com/#q=viewcomic,,2016-05-27,10:24:48.970
+http://viewcomic.com/dc-universe-rebirth-001-2016/,DC Universe – Rebirth 001 (2016) ……………… | View Comic,2016-05-27,10:24:51.427
+https://www.google.com/,Google,2016-05-27,10:31:27.452
+http://viewcomic.com/dc-universe-rebirth-001-2016/,DC Universe – Rebirth 001 (2016) ……………… | View Comic,2016-05-27,10:31:41.839
+file:/F:/index.html,DC Universe – Rebirth 001 (2016) ……………… | View Comic,2016-05-27,10:35:45.184
+https://www.google.com/,Google,2016-05-27,11:11:23.072
+http://viewcomic.com/dc-universe-rebirth-001-2016/,DC Universe – Rebirth 001 (2016) ……………… | View Comic,2016-05-27,11:11:46.494
+https://www.google.com/,Google,2016-05-27,11:15:18.383
+http://viewcomic.com/dc-universe-rebirth-001-2016/,DC Universe – Rebirth 001 (2016) ……………… | View Comic,2016-05-27,11:15:35.344
+file:/F:/index.html,DC Universe – Rebirth 001 (2016) ……………… | View Comic,2016-05-27,11:17:51.417
+https://www.google.com/,Google,2016-05-27,11:28:46.284
+https://www.google.com/#q=example+pdf+file,example pdf file - Google Search,2016-05-27,11:28:50.419
+https://www.google.com/,Google,2016-05-27,18:58:15.301
+https://www.youtube.com/,,2016-05-27,18:58:24.972
+https://www.youtube.com/watch?v=ix4mTekl3MM,A New Chapter for Fair Use on YouTube - YouTube,2016-05-27,18:58:29.220

@@ -5,13 +5,14 @@
  */
 package application.features;
 
-import velocity.manager.FavoritesManager;
 import javafx.collections.ListChangeListener;
 import javafx.collections.MapChangeListener;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import velocity.core.VelocityEngine;
+import velocity.manager.FavoritesManager;
 
 /**
  *
@@ -19,36 +20,37 @@ import velocity.core.VelocityEngine;
  */
 public class FavoritesBar extends BorderPane {
 
-    private final ToolBar bar;
+    private final HBox bar;
 
     public FavoritesBar(VelocityEngine engine) {
-        bar = new ToolBar();
+        bar = new HBox(5);
+        bar.setPadding(new Insets(5));
         FavoritesManager.getInstance().getFavorites().addListener((MapChangeListener.Change<? extends String, ? extends String> change) -> {
             if (change.wasAdded()) {
-                bar.getItems().add(new FavoritesItem(change.getKey(), change.getValueAdded(), engine));
+                bar.getChildren().add(new FavoritesItem(change.getKey(), change.getValueAdded(), engine));
                 setCenter(bar);
             } else if (change.wasRemoved()) {
-                for (int x = bar.getItems().size() - 1; x >= 0; x--) {
-                    Node n = bar.getItems().get(x);
+                for (int x = bar.getChildren().size() - 1; x >= 0; x--) {
+                    Node n = bar.getChildren().get(x);
                     if (n instanceof FavoritesItem) {
                         FavoritesItem fi = (FavoritesItem) n;
                         if ((change.getValueRemoved().equals(fi.getValue()))) {
-                            bar.getItems().remove(x);
+                            bar.getChildren().remove(x);
                         }
                     }
                 }
             }
         });
-        bar.getItems().addListener((ListChangeListener.Change<? extends Node> c) -> {
+        bar.getChildren().addListener((ListChangeListener.Change<? extends Node> c) -> {
             c.next();
             if (c.getList().isEmpty()) {
                 setCenter(null);
             }
         });
         for (String key : FavoritesManager.getInstance().getFavorites().keySet()) {
-            bar.getItems().add(new FavoritesItem(key, FavoritesManager.getInstance().getFavorites().get(key), engine));
+            bar.getChildren().add(new FavoritesItem(key, FavoritesManager.getInstance().getFavorites().get(key), engine));
         }
-        if (bar.getItems().size() > 0) {
+        if (bar.getChildren().size() > 0) {
             setCenter(bar);
         }
     }

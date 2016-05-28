@@ -16,30 +16,50 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import velocity.core.VelocityEngine;
 import velocity.manager.HistoryManager;
 import velocity.manager.HistoryManager.WebEntry;
+import velocity.manager.SettingsManager;
+import velocity.manager.SettingsManager.SettingsListener;
 import velocity.util.DialogUtils;
+import velocity.view.CustomTab;
 
 /**
  *
  * @author Aniket
  */
-public class HistoryPane extends BorderPane {
+public class HistoryPane extends CustomTab {
 
     private final ListView<WebEntry> view;
     private final VelocityEngine engine;
     private final ArrayList<WebEntry> allEntries;
     private final BorderPane top;
-    private final ToolBar searchBar;
+    private final HBox searchBar;
     private final Button search, clear;
     private final TextField field;
+    private final SettingsListener listener;
+
+    @Override
+    public void close() {
+        SettingsManager.removeSettingsListener(listener);
+    }
 
     public HistoryPane(VelocityEngine engine) {
+        if (!Boolean.parseBoolean(SettingsManager.getProperty("darkTheme"))) {
+            setStyle("-fx-background-color:white;");
+        }
+        SettingsManager.addSettingsListener(listener = (settingsKey, oldValue, newValue) -> {
+            if (settingsKey.equals("darkTheme")) {
+                if (Boolean.parseBoolean(newValue)) {
+                    setStyle("");
+                } else {
+                    setStyle("-fx-background-color:white;");
+                }
+            }
+        });
         this.engine = engine;
         setPadding(new Insets(5, 10, 5, 10));
         view = new ListView<>();
@@ -48,9 +68,10 @@ public class HistoryPane extends BorderPane {
         Label l;
         top.setTop(l = new Label("History"));
         l.setFont(new Font(18));
-        top.setRight(searchBar = new ToolBar());
-        searchBar.getItems().add(clear = new Button("Clear History"));
-        searchBar.getItems().addAll(field = new TextField(), search = new Button("Search"));
+        top.setRight(searchBar = new HBox(5));
+        searchBar.setPadding(new Insets(5));
+        searchBar.getChildren().add(clear = new Button("Clear History"));
+        searchBar.getChildren().addAll(field = new TextField(), search = new Button("Search"));
         field.setPromptText("Search");
         allEntries = new ArrayList<>();
         field.setOnAction((e) -> {

@@ -23,7 +23,11 @@ public class FavoritesItem extends Button {
         setText(name);
         value = url;
         setOnAction((e) -> {
-            engine.launchPopup(url);
+            if (engine.getLocation().equals("") || engine.getLocation().equals("about:blank")) {
+                engine.load(url);
+            } else {
+                engine.launchPopup(url);
+            }
         });
         setContextMenu(new ContextMenu(new MenuItem("Open"), new MenuItem("Open in New Tab"), new MenuItem("Delete")));
         getContextMenu().getItems().get(0).setOnAction((e) -> {

@@ -18,10 +18,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ToolBar;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import velocity.core.Download;
 import velocity.core.VelocityCore;
 
@@ -36,7 +36,7 @@ public class DownloadItem extends BorderPane {
     private final MenuButton file;
     private final Label error;
 
-    public DownloadItem(Download d, ToolBar toolbar, DownloadBar down) {
+    public DownloadItem(Download d, HBox hbox, DownloadBar down) {
         setPadding(new Insets(5, 10, 5, 10));
         setCenter(bar = new ProgressBar());
         setRight(cancel = new Button("x"));
@@ -63,17 +63,17 @@ public class DownloadItem extends BorderPane {
             } else if (getCenter() == error) {
                 setCenter(null);
                 setRight(null);
-                toolbar.getItems().remove(this);
+                hbox.getChildren().remove(this);
             } else if (getCenter() == file) {
                 setCenter(null);
                 setRight(null);
-                toolbar.getItems().remove(this);
+                hbox.getChildren().remove(this);
             } else if (getCenter() instanceof Label) {
                 Label l = (Label) getCenter();
                 if (l.getText().equals("Download Cancelled")) {
                     setCenter(null);
                     setRight(null);
-                    toolbar.getItems().remove(this);
+                    hbox.getChildren().remove(this);
                 }
             }
         });
