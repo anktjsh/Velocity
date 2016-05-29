@@ -167,7 +167,7 @@ public class SettingsPane extends CustomTab {
                 removeCookie.setDisable(true);
             }
         });
-        box.getChildren().addAll(new Label("Velocity v1.0.0 Created by Aniket Joshi"));
+        box.getChildren().addAll(new Label("Velocity v1.0.1 Created by Aniket Joshi"));
         sceneProperty().addListener((ob, older, newer) -> {
             if (newer != null) {
                 box.setMinWidth(newer.getWidth() - 35);

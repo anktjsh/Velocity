@@ -496,7 +496,7 @@ public class BrowserView extends Tab implements Serializable {
             DialogUtils.showAlert(AlertType.INFORMATION, getTabPane().getScene().getWindow(),
                     "Velocity Information",
                     VelocityCore.isDesktop()
-                            ? "Velocity v1.0.0" : "Velocity v1.0.0\nCreated by Aniket Joshi",
+                            ? "Velocity v1.0.1" : "Velocity v1.0.1\nCreated by Aniket Joshi",
                     VelocityCore.isDesktop() ? "Created by Aniket Joshi" : "");
         });
         options.getItems().get(9).setOnAction((e) -> {

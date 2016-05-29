@@ -57,7 +57,7 @@ public class Desktop extends Application {
             primary.getScene().getStylesheets().add(material);
         }
         primary.getIcons().add(web);
-        primary.setTitle("Velocity v1.0.0");
+        primary.setTitle("Velocity v1.0.1");
         primary.setOnHidden((e) -> {
             close(pane);
         });

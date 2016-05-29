@@ -75,7 +75,7 @@ public class Mobile extends MobileApplication {
                 ((BrowserPane) retrieveView(HOME_VIEW).get().getCenter()).resolve(e);
             });
             primary.getIcons().add(Desktop.web);
-            primary.setTitle("Velocity v1.0.0");
+            primary.setTitle("Velocity v1.0.1");
             primary.setOnHidden((e) -> {
                 Desktop.close(((BrowserPane) retrieveView(HOME_VIEW).get().getCenter()));
             });
