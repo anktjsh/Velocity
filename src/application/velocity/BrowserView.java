@@ -61,6 +61,7 @@ import velocity.handler.SaveHandler;
 import velocity.handler.VelocityListener;
 import velocity.manager.FavoritesManager;
 import velocity.util.DialogUtils;
+import velocity.util.FileUtils;
 import velocity.view.CustomTab;
 import velocity.view.GlistenChoiceDialog;
 import velocity.view.GlistenDoubleInputDialog;
@@ -88,18 +89,18 @@ public class BrowserView extends Tab implements Serializable {
     private String lastTyped;
 
     public BrowserView(String url, boolean incog) {
+        super("New Tab");
         view = new VelocityView();
         if (VelocityCore.isDesktop()) {
             view.getEngine().enableJavaScript();
         }
         view.getEngine().incognitoProperty().addListener((ob, oler, newer) -> {
-            System.out.println(newer);
             if (newer) {
                 setGraphic(incognito);
             } else {
                 setGraphic(null);
             }
-        });        
+        });
         view.getEngine().setIncognito(incog);
         menu = new ContextMenu();
         setContextMenu(menu);
@@ -174,6 +175,15 @@ public class BrowserView extends Tab implements Serializable {
                 if (newer.startsWith("velocityfx://")) {
                     refresh.setGraphic(refreshGraphic);
                 }
+                if (getText().equals("New Tab")) {
+                    if (!newer.equals("about:blank")) {
+                        if (newer.length() > 30) {
+                            setText(newer.substring(0, 30));
+                        } else {
+                            setText(newer);
+                        }
+                    }
+                }
             }
         });
         view.getEngine().setSaveHandler(new SaveHandler() {
@@ -188,10 +198,10 @@ public class BrowserView extends Tab implements Serializable {
                 }
                 extension = filename.substring(filename.lastIndexOf('.') + 1);
                 String sa = VelocityCore.getDefaultDownloadsLocation() + File.separator + filename.substring(0, filename.lastIndexOf('.'));
-                File f = new File(sa + "." + extension);
+                File f = FileUtils.newFile(sa + "." + extension);
                 int x = 1;
                 while (f.exists()) {
-                    f = new File(sa + " (" + x + ")" + "." + extension);
+                    f = FileUtils.newFile(sa + " (" + x + ")" + "." + extension);
                     x++;
                 }
                 return new DownloadResult(f, DownloadResult.CUSTOM);
@@ -204,7 +214,7 @@ public class BrowserView extends Tab implements Serializable {
                     String fileName = url.substring(url.lastIndexOf('/') + 1);
                     if (fileName.contains(".")) {
                         String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
-                        File f = new File("hello." + extension);
+                        File f = FileUtils.newFile("hello." + extension);
                         String type = null;
                         try {
                             type = Files.probeContentType(f.toPath());
@@ -555,7 +565,7 @@ public class BrowserView extends Tab implements Serializable {
             public void onLoadFailed() {
                 if (lastTyped != null) {
                     view.getEngine().load("https://www.google.com/search?q=" + lastTyped + "&oq=" + lastTyped + "&aqs=chrome..69i57j0l2j69i65j0l2.1918j0j7&sourceid=chrome&ie=UTF-8");
-                } else {
+                } else if (!(view.getEngine().getLocation().isEmpty() || view.getEngine().getLocation().equals("about:blank"))) {
                     DialogUtils.showAlert(AlertType.WARNING, getTabPane() != null ? getTabPane().getScene().getWindow() : null, "Internet", "You are not connected to the internet!", "");
                 }
             }

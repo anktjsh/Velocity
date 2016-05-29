@@ -36,6 +36,7 @@ import org.jpedal.examples.viewer.gui.javafx.dialog.FXInputDialog;
 import org.jpedal.exception.PdfException;
 import org.jpedal.external.PluginHandler;
 import org.jpedal.objects.PdfPageData;
+import velocity.util.FileUtils;
 
 /**
  *
@@ -337,7 +338,7 @@ public class PdfReader extends BorderPane {
             if (input.startsWith("http")) {
                 openFile(null, input, true);
             } else {
-                openFile(new File(input), null, false);
+                openFile(FileUtils.newFile(input), null, false);
             }
 
         }

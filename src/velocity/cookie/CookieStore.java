@@ -10,7 +10,6 @@ package velocity.cookie;
  * @author Aniket
  */
 import java.io.File;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -249,7 +248,7 @@ final class CookieStore {
                         ));
             }
         }
-        File f = new File("cookies.txt");
+        File f = FileUtils.newFile("cookies.txt");
         ArrayList<String> al = new ArrayList<>();
         for (String u : map.keySet()) {
             for (List<String> list : map.get(u)) {
@@ -261,28 +260,29 @@ final class CookieStore {
 
     public void load() {
         ArrayList<String> al = new ArrayList<>();
-        al.addAll(FileUtils.readAllLines(new File("cookies.txt")));
+        al.addAll(FileUtils.readAllLines(FileUtils.newFile("cookies.txt")));
         for (String s : al) {
-            String temp = s.substring(0, s.indexOf("="));
-            URI uri = URI.create(temp);
             String oper = s.substring(s.indexOf("=") + 1, s.lastIndexOf("]") + 1);
             if (oper.contains("[")) {
                 oper = oper.substring(1, oper.length() - 1);
                 String[] spl = oper.split(", ");
                 if (spl.length > 0) {
                     if (!spl[0].isEmpty()) {
-                        Cookie c = new Cookie(spl[0],
-                                spl[1],
-                                Long.parseLong(spl[2]),
-                                spl[3],
-                                spl[4],
-                                new ExtendedTime(Long.parseLong(spl[5]), Integer.parseInt(spl[6])),
-                                Long.parseLong(spl[7]),
-                                Boolean.parseBoolean(spl[8]),
-                                Boolean.parseBoolean(spl[9]),
-                                Boolean.parseBoolean(spl[10]),
-                                Boolean.parseBoolean(spl[11]));
-                        put(c);
+                        try {
+                            Cookie c = new Cookie(spl[0],
+                                    spl[1],
+                                    Long.parseLong(spl[2]),
+                                    spl[3],
+                                    spl[4],
+                                    new ExtendedTime(Long.parseLong(spl[5]), Integer.parseInt(spl[6])),
+                                    Long.parseLong(spl[7]),
+                                    Boolean.parseBoolean(spl[8]),
+                                    Boolean.parseBoolean(spl[9]),
+                                    Boolean.parseBoolean(spl[10]),
+                                    Boolean.parseBoolean(spl[11]));
+                            put(c);
+                        } catch (Exception e) {
+                        }
                     }
                 }
             }

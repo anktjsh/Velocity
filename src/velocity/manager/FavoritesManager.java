@@ -5,7 +5,6 @@
  */
 package velocity.manager;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.TreeMap;
 import javafx.collections.FXCollections;
@@ -46,7 +45,7 @@ public class FavoritesManager {
 
     public void load() {
         ArrayList<String> al = new ArrayList<>();
-        al.addAll(FileUtils.readAllLines(new File("favorites.txt")));
+        al.addAll(FileUtils.readAllLines(FileUtils.newFile("favorites.txt")));
         for (String s : al) {
             String spl[] = s.split(",");
             favorites.put(spl[0], spl[1]);
@@ -58,6 +57,6 @@ public class FavoritesManager {
         for (String s : favorites.keySet()) {
             al.add(s + "," + favorites.get(s));
         }
-        FileUtils.write(new File("favorites.txt"), al);
+        FileUtils.write(FileUtils.newFile("favorites.txt"), al);
     }
 }

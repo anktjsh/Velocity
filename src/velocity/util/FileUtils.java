@@ -5,6 +5,7 @@
  */
 package velocity.util;
 
+import com.gluonhq.charm.down.common.PlatformFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -15,6 +16,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import velocity.core.VelocityCore;
 
 /**
  *
@@ -103,5 +105,15 @@ public class FileUtils {
 
     public static long size(File f) {
         return f.length();
+    }
+
+    public static File newFile(String s) {
+        if (!VelocityCore.isDesktop()) {
+            try {
+                return new File(PlatformFactory.getPlatform().getPrivateStorage().getAbsolutePath() + File.separator + s);
+            } catch (IOException ex) {
+            }
+        }
+        return new File(s);
     }
 }

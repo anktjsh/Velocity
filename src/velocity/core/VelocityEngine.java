@@ -93,7 +93,7 @@ public final class VelocityEngine {
     private final ReadOnlyBooleanWrapper canGoBackProperty = new ReadOnlyBooleanWrapper();
     private final BooleanProperty dialogsSuppressed = new SimpleBooleanProperty();
     private final BooleanProperty popupsSuppressed = new SimpleBooleanProperty();
-    private final BooleanProperty incognitoProperty =new SimpleBooleanProperty();
+    private final BooleanProperty incognitoProperty = new SimpleBooleanProperty();
 
     private boolean isImage;
     private String srcUrl;
@@ -189,11 +189,13 @@ public final class VelocityEngine {
                 }
             }
         });
-        web.getEngine().documentProperty().addListener((ob, older, newer) -> {
-            if (newer != null) {
-                registerListeners(newer);
-            }
-        });
+        if (VelocityCore.isDesktop()) {
+            web.getEngine().documentProperty().addListener((ob, older, newer) -> {
+                if (newer != null) {
+                    registerListeners(newer);
+                }
+            });
+        }
         web.getEngine().titleProperty().addListener((ob, older, newer) -> {
             titleProperty.set(newer);
         });
@@ -320,23 +322,21 @@ public final class VelocityEngine {
         setConfirmHandler(new DefaultConfirmHandler(this));
         setVelocityListener(new DefaultVelocityListener(this));
         incognitoProperty.set(false);
-        incognitoProperty.addListener((ob, older, newer )-> {
+        incognitoProperty.addListener((ob, older, newer) -> {
             if (newer) {
-                if (!older){
+                if (!older) {
                     HistoryManager.getInstance().removeEngine(web.getEngine());
                 }
-            } else {
-                if (older) {
-                    HistoryManager.getInstance().removeEngine(web.getEngine());
-                }
+            } else if (older) {
+                HistoryManager.getInstance().removeEngine(web.getEngine());
             }
         });
     }
-    
+
     public boolean isIncognito() {
         return incognitoProperty.get();
     }
-    
+
     public BooleanProperty incognitoProperty() {
         return incognitoProperty;
     }

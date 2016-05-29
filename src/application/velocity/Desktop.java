@@ -10,7 +10,6 @@ import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
@@ -47,8 +46,6 @@ public class Desktop extends Application {
                     if (db.hasFiles()) {
                         success = true;
                         pane.loadFiles(db.getFiles());
-                    } else if (db.getContent(new DataFormat("Tab")) != null) {
-
                     }
                     event.setDropCompleted(success);
                     event.consume();

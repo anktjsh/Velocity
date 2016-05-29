@@ -5,7 +5,6 @@
  */
 package velocity.manager;
 
-import java.io.File;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -72,6 +71,7 @@ public class HistoryManager {
                 for (WebHistory.Entry we : c.getAddedSubList()) {
                     WebEntry w;
                     entries.add(w = new WebEntry(we));
+                    System.out.println("History Manager : " + we);
                     Website site = contains(frequency, we.getUrl());
                     if (site != null) {
                     } else {
@@ -224,12 +224,12 @@ public class HistoryManager {
         for (WebEntry we : entries) {
             al.add(we.toString());
         }
-        FileUtils.write(new File("history.txt"), al);
+        FileUtils.write(FileUtils.newFile("history.txt"), al);
     }
 
     public void load() {
         ArrayList<String> al = new ArrayList<>();
-        al.addAll(FileUtils.readAllLines(new File("history.txt")));
+        al.addAll(FileUtils.readAllLines(FileUtils.newFile("history.txt")));
         for (String s : al) {
             String[] spl = s.split(",");
             if (spl.length == 4) {

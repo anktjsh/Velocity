@@ -5,7 +5,6 @@
  */
 package velocity.manager;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.TreeMap;
 import javafx.beans.property.SimpleStringProperty;
@@ -34,7 +33,7 @@ public class SettingsManager {
 
     public static void load() {
         ArrayList<String> al = new ArrayList<>();
-        al.addAll(FileUtils.readAllLines(new File("properties.txt")));
+        al.addAll(FileUtils.readAllLines(FileUtils.newFile("properties.txt")));
         for (int x = 0; x < al.size(); x += 2) {
             if (properties.keySet().contains(al.get(x))) {
                 properties.get(al.get(x)).set(al.get(x + 1));
@@ -68,7 +67,7 @@ public class SettingsManager {
             al.add(s);
             al.add(properties.get(s).get());
         }
-        FileUtils.write(new File("properties.txt"), al);
+        FileUtils.write(FileUtils.newFile("properties.txt"), al);
     }
 
     public static interface SettingsListener {

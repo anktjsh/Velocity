@@ -48,6 +48,14 @@ public class VelocityCore {
     public static boolean isDesktop() {
         return PlatformFactory.getPlatform().getName().equals(PlatformFactory.DESKTOP);
     }
+    
+    public static boolean isIOS() {
+        return PlatformFactory.getPlatform().getName().equals(PlatformFactory.IOS);
+    }
+    
+    public static boolean isAndroid() {
+        return PlatformFactory.getPlatform().getName().equals(PlatformFactory.ANDROID);
+    }
 
     static {
         initialize();

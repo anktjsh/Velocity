@@ -5,7 +5,6 @@
  */
 package velocity.manager;
 
-import java.io.File;
 import java.util.ArrayList;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -67,16 +66,16 @@ public class DownloadManager {
         for (Download we : downloads) {
             al.add(we.getRemoteUrl() + "," + we.getLocalFile().getAbsolutePath());
         }
-        FileUtils.write(new File("downloads.txt"), al);
+        FileUtils.write(FileUtils.newFile("downloads.txt"), al);
     }
 
     public void load() {
         ArrayList<String> al = new ArrayList<>();
-        al.addAll(FileUtils.readAllLines(new File("downloads.txt")));
+        al.addAll(FileUtils.readAllLines(FileUtils.newFile("downloads.txt")));
         for (String s : al) {
             String[] spl = s.split(",");
             if (spl.length == 2) {
-                downloads.add(new Download(spl[0], new File(spl[1]), null, -1));
+                downloads.add(new Download(spl[0], FileUtils.newFile(spl[1]), null, -1));
             }
         }
     }
