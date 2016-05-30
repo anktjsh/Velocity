@@ -94,6 +94,7 @@ public final class VelocityEngine {
     private final BooleanProperty dialogsSuppressed = new SimpleBooleanProperty();
     private final BooleanProperty popupsSuppressed = new SimpleBooleanProperty();
     private final BooleanProperty incognitoProperty = new SimpleBooleanProperty();
+    private String htmlText = "";
 
     private boolean isImage;
     private String srcUrl;
@@ -167,10 +168,12 @@ public final class VelocityEngine {
                         locationProperty.set(spl[0] + spl[1]);
                     }
                 } else if (newer.isEmpty() || newer.equals("about:blank")) {
-                    titleProperty.set("New Tab");
-                    view.setCenter(null);
-                    if (getVelocityListener() != null) {
-                        view.setCenter(getVelocityListener().startPage());
+                    if (htmlText.isEmpty()) {
+                        titleProperty.set("New Tab");
+                        view.setCenter(null);
+                        if (getVelocityListener() != null) {
+                            view.setCenter(getVelocityListener().startPage());
+                        }
                     }
                 } else if (contentType != null && contentType.startsWith("application/")) {
                     if (getSaveHandler() != null) {
@@ -187,6 +190,7 @@ public final class VelocityEngine {
                 } else if (!(view.getCenter() instanceof WebView)) {
                     view.setCenter(web);
                 }
+                htmlText = "";
             }
         });
         if (VelocityCore.isDesktop()) {
@@ -795,6 +799,7 @@ public final class VelocityEngine {
     }
 
     public void loadHtml(String html) {
+        htmlText = html;
         web.getEngine().loadContent(html);
     }
 }

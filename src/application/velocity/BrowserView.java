@@ -81,12 +81,10 @@ public class BrowserView extends Tab implements Serializable {
     private final HBox bar;
     private final Button back, forward, refresh, favorite;
     private final MenuButton options;
-    private final CustomMenuItem zoomItem;
     private final BorderPane main, top;
     private final StatusBar status;
     private final ContextMenu menu;
     private final CheckBox dialog, popup;
-    private String lastTyped;
 
     public BrowserView(String url, boolean incog) {
         super("New Tab");
@@ -464,7 +462,7 @@ public class BrowserView extends Tab implements Serializable {
                 new MenuItem("New Incognito Tab"),
                 new MenuItem("History\t\tCtrl+H"),
                 new MenuItem("Downloads\tCtrl+J"),
-                zoomItem = new ZoomMenuItem(view),
+                new ZoomMenuItem(view),
                 new MenuItem("Save File As"),
                 new MenuItem("Print\t\t\tCtrl+P"),
                 new MenuItem("Settings"),
@@ -496,7 +494,7 @@ public class BrowserView extends Tab implements Serializable {
             DialogUtils.showAlert(AlertType.INFORMATION, getTabPane().getScene().getWindow(),
                     "Velocity Information",
                     VelocityCore.isDesktop()
-                            ? "Velocity v1.0.1" : "Velocity v1.0.1\nCreated by Aniket Joshi",
+                            ? "Velocity v" + BrowserPane.VERSION : "Velocity v" + BrowserPane.VERSION + "\nCreated by Aniket Joshi",
                     VelocityCore.isDesktop() ? "Created by Aniket Joshi" : "");
         });
         options.getItems().get(9).setOnAction((e) -> {
@@ -563,11 +561,16 @@ public class BrowserView extends Tab implements Serializable {
 
             @Override
             public void onLoadFailed() {
-                if (lastTyped != null) {
-                    view.getEngine().load("https://www.google.com/search?q=" + lastTyped + "&oq=" + lastTyped + "&aqs=chrome..69i57j0l2j69i65j0l2.1918j0j7&sourceid=chrome&ie=UTF-8");
-                } else if (!(view.getEngine().getLocation().isEmpty() || view.getEngine().getLocation().equals("about:blank"))) {
-                    DialogUtils.showAlert(AlertType.WARNING, getTabPane() != null ? getTabPane().getScene().getWindow() : null, "Internet", "You are not connected to the internet!", "");
-                }
+                view.getEngine().loadHtml("<!DOCTYPE html>\n"
+                        + "<html>\n<head>\n"
+                        + "<title>" + view.getEngine().getLocation() + "</title>\n"
+                        + "</head>"
+                        + "<body>\n"
+                        + "\n"
+                        + "<h1 style=\"text-align:center;\">Unable to reach address</h1>\n"
+                        + "\n"
+                        + "</body>\n"
+                        + "</html>");
             }
 
             @Override
@@ -579,24 +582,19 @@ public class BrowserView extends Tab implements Serializable {
             }
         });
         field.setOnAction((e) -> {
-            (new Thread(() -> {
-                if (field.getText().equals(view.getEngine().getLocation())) {
-                    Platform.runLater(()
-                            -> load(field.getText()));
+            if (field.getText().equals(view.getEngine().getLocation())) {
+                load(field.getText());
+            } else {
+                String s = field.getText().trim();
+                if (s.contains(" ")) {
+                    load("https://www.google.com/search?q=" + s.replaceAll(" ", "+") + "&oq=" + s.replaceAll(" ", "+") + "&aqs=chrome..69i57j0l2j69i65j0l2.1918j0j7&sourceid=chrome&ie=UTF-8");
+                } else if (FileUtils.isUrl(s)) {
+                    load(s);
                 } else {
-                    String s = field.getText();
-                    lastTyped = s;
-                    if (s.contains(" ")) {
-                        Platform.runLater(()
-                                -> view.getEngine().load("https://www.google.com/search?q=" + s + "&oq=" + s + "&aqs=chrome..69i57j0l2j69i65j0l2.1918j0j7&sourceid=chrome&ie=UTF-8"));
-                    } else {
-                        Platform.runLater(()
-                                -> load(s));
-                    }
-                    Platform.runLater(()
-                            -> field.getParent().requestFocus());
+                    load("https://www.google.com/search?q=" + s.replaceAll(" ", "+") + "&oq=" + s.replaceAll(" ", "+") + "&aqs=chrome..69i57j0l2j69i65j0l2.1918j0j7&sourceid=chrome&ie=UTF-8");
                 }
-            })).start();
+            }
+            field.getParent().requestLayout();
         });
         setOnClosed((E) -> {
             view.dispose();
@@ -641,10 +639,14 @@ public class BrowserView extends Tab implements Serializable {
             if (!url.contains(":")) {
                 url = "https://" + url;
             }
-            view.getEngine().load(url);
+            loadUrl(url);
         } else {
-            view.getEngine().load(url);
+            loadUrl(url);
         }
+    }
+
+    private void loadUrl(String s) {
+        view.getEngine().load(s);
     }
 
     public VelocityEngine getVelocityEngine() {

@@ -27,6 +27,7 @@ import velocity.manager.SettingsManager;
  */
 public class BrowserPane extends BorderPane {
 
+    public static String VERSION = "1.0.2";
     private final TabPane tabs;
     private final DownloadBar bar;
 

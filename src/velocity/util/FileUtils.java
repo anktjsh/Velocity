@@ -16,6 +16,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import velocity.core.VelocityCore;
 
 /**
@@ -116,4 +118,16 @@ public class FileUtils {
         }
         return new File(s);
     }
+
+    public static boolean isUrl(String input) {
+        Matcher m = one.matcher(input);
+        if (m.matches()) {
+            return true;
+        }
+        m = two.matcher(input);
+        return m.matches();
+    }
+    private final static Pattern one = Pattern.compile("(@)?(href=')?(HREF=')?(HREF=\")?(href=\")?(http://)?(https://)?[a-zA-Z_0-9\\-]+(\\.\\w[a-zA-Z_0-9\\-]+)+(/[#&\\n\\-=?\\+\\%/\\.\\w]+)?");
+    private final static Pattern two = Pattern.compile("((([A-Za-z]{3,9}:(?:\\/\\/)?)(?:[-;:&=\\+\\$,\\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\\+\\$,\\w]+@)[A-Za-z0-9.-]+)((?:\\/[\\+~%\\/.\\w-_]*)?\\??(?:[-\\+=&;%@.\\w_]*)#?(?:[\\w]*))?)");
+
 }

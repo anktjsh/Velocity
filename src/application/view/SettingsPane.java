@@ -5,6 +5,7 @@
  */
 package application.view;
 
+import application.velocity.BrowserPane;
 import application.velocity.Desktop;
 import com.gluonhq.charm.glisten.visual.Theme;
 import java.io.File;
@@ -167,7 +168,7 @@ public class SettingsPane extends CustomTab {
                 removeCookie.setDisable(true);
             }
         });
-        box.getChildren().addAll(new Label("Velocity v1.0.1 Created by Aniket Joshi"));
+        box.getChildren().addAll(new Label("Velocity v" + BrowserPane.VERSION + " Created by Aniket Joshi"));
         sceneProperty().addListener((ob, older, newer) -> {
             if (newer != null) {
                 box.setMinWidth(newer.getWidth() - 35);

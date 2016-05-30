@@ -5,14 +5,18 @@
  */
 package application.velocity;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import javafx.application.Application;
 import javafx.application.HostServices;
 import javafx.application.Platform;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import velocity.manager.SettingsManager;
 
 /**
@@ -24,6 +28,34 @@ public class Desktop extends Application {
     public static HostServices host;
     public static final String material = Desktop.class.getResource("material.css").toExternalForm();
     public static final Image web = new Image(Desktop.class.getResourceAsStream("web.png"));
+
+    @Override
+    public void init() {
+        Thread.setDefaultUncaughtExceptionHandler((Thread t, Throwable e) -> {
+            e.printStackTrace();
+            if (e instanceof Error) {
+                Iterator<Window> impl = Stage.impl_getWindows();
+                ArrayList<BrowserPane> bp = new ArrayList<>();
+                while (impl.hasNext()) {
+                    Window w = impl.next();
+                    if (w instanceof Stage) {
+                        Stage s = (Stage) w;
+                        Parent root = s.getScene().getRoot();
+                        if (root instanceof BrowserPane) {
+                            bp.add((BrowserPane) root);
+                        }
+                    }
+                }
+                Platform.runLater(() -> {
+                    for (BrowserPane b : bp) {
+                        b.close();
+                    }
+                    Platform.exit();
+                    System.exit(0);
+                });
+            }
+        });
+    }
 
     @Override
     public void start(Stage primary) {
@@ -57,7 +89,7 @@ public class Desktop extends Application {
             primary.getScene().getStylesheets().add(material);
         }
         primary.getIcons().add(web);
-        primary.setTitle("Velocity v1.0.1");
+        primary.setTitle("Velocity v" + BrowserPane.VERSION);
         primary.setOnHidden((e) -> {
             close(pane);
         });

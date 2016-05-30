@@ -44,17 +44,21 @@ public class VelocityCore {
     private static final ObjectProperty<String> defaultDownloadsLocation = new SimpleObjectProperty<>();
     private static final ArrayList<String> supportedFormats = new ArrayList<>();
     private static final ObservableList<String> blocked = FXCollections.observableArrayList();
+    public static String current = PlatformFactory.getPlatform().getName();
+    public static String DESKTOP = PlatformFactory.DESKTOP;
+    public static String ANDROID = PlatformFactory.ANDROID;
+    public static String IOS = PlatformFactory.IOS;
 
     public static boolean isDesktop() {
-        return PlatformFactory.getPlatform().getName().equals(PlatformFactory.DESKTOP);
+        return current.equals(DESKTOP);
     }
-    
+
     public static boolean isIOS() {
-        return PlatformFactory.getPlatform().getName().equals(PlatformFactory.IOS);
+        return current.equals(IOS);
     }
-    
+
     public static boolean isAndroid() {
-        return PlatformFactory.getPlatform().getName().equals(PlatformFactory.ANDROID);
+        return current.equals(ANDROID);
     }
 
     static {

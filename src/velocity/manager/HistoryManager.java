@@ -71,7 +71,6 @@ public class HistoryManager {
                 for (WebHistory.Entry we : c.getAddedSubList()) {
                     WebEntry w;
                     entries.add(w = new WebEntry(we));
-                    System.out.println("History Manager : " + we);
                     Website site = contains(frequency, we.getUrl());
                     if (site != null) {
                     } else {
