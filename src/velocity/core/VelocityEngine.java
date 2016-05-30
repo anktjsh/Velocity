@@ -179,7 +179,9 @@ public final class VelocityEngine {
                     if (getSaveHandler() != null) {
                         String filename = getFileName(disposition);
                         DownloadResult f = getSaveHandler().automaticDownload(newer, contentType, filename);
-                        download(newer, f.getFile(), f.getType());
+                        if (f != null) {
+                            download(newer, f.getFile(), f.getType());
+                        }
                     }
                     reloadThread();
                 } else if (newer.endsWith(".pdf")) {

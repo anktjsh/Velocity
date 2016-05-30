@@ -188,74 +188,86 @@ public class BrowserView extends Tab implements Serializable {
 
             @Override
             public DownloadResult automaticDownload(String url, String contentType, String name) {
-                String filename, extension;
-                if (name == null) {
-                    filename = url.substring(url.lastIndexOf('/') + 1);
-                } else {
-                    filename = name;
+                try {
+                    String filename, extension;
+                    if (name == null) {
+                        filename = url.substring(url.lastIndexOf('/') + 1);
+                    } else {
+                        filename = name;
+                    }
+                    extension = filename.substring(filename.lastIndexOf('.') + 1);
+                    String sa = VelocityCore.getDefaultDownloadsLocation() + File.separator + filename.substring(0, filename.lastIndexOf('.'));
+                    File f = FileUtils.newFile(sa + "." + extension);
+                    int x = 1;
+                    while (f.exists()) {
+                        f = FileUtils.newFile(sa + " (" + x + ")" + "." + extension);
+                        x++;
+                    }
+                    return new DownloadResult(f, DownloadResult.CUSTOM);
+                } catch (Exception e) {
+                    return null;
                 }
-                extension = filename.substring(filename.lastIndexOf('.') + 1);
-                String sa = VelocityCore.getDefaultDownloadsLocation() + File.separator + filename.substring(0, filename.lastIndexOf('.'));
-                File f = FileUtils.newFile(sa + "." + extension);
-                int x = 1;
-                while (f.exists()) {
-                    f = FileUtils.newFile(sa + " (" + x + ")" + "." + extension);
-                    x++;
-                }
-                return new DownloadResult(f, DownloadResult.CUSTOM);
             }
 
             @Override
             public DownloadResult saveAs(String url) {
-                FileChooser fc = new FileChooser();
-                if (url.contains("/")) {
-                    String fileName = url.substring(url.lastIndexOf('/') + 1);
-                    if (fileName.contains(".")) {
-                        String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
-                        File f = FileUtils.newFile("hello." + extension);
-                        String type = null;
-                        try {
-                            type = Files.probeContentType(f.toPath());
-                        } catch (IOException ex) {
+                try {
+                    FileChooser fc = new FileChooser();
+                    if (url.contains("/")) {
+                        String fileName = url.substring(url.lastIndexOf('/') + 1);
+                        if (fileName.contains(".")) {
+                            String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
+                            File f = FileUtils.newFile("hello." + extension);
+                            String type = null;
+                            try {
+                                type = Files.probeContentType(f.toPath());
+                            } catch (IOException ex) {
+                            }
+                            if (type != null) {
+                                fc.getExtensionFilters().add(new ExtensionFilter(extension.toUpperCase() + " File", "*." + extension));
+                            }
+                            fc.setInitialFileName(fileName);
                         }
-                        if (type != null) {
-                            fc.getExtensionFilters().add(new ExtensionFilter(extension.toUpperCase() + " File", "*." + extension));
-                        }
-                        fc.setInitialFileName(fileName);
                     }
-                }
-                fc.getExtensionFilters().add(new ExtensionFilter("Complete WebPage", "*.html"));
-                fc.getExtensionFilters().add(new ExtensionFilter("HTML File", "*.html"));
-                if (fc.getExtensionFilters().get(0).getDescription().startsWith("Complete")) {
-                    fc.setInitialFileName("index.html");
-                }
-                File file = fc.showSaveDialog(getTabPane().getScene().getWindow());
-                if (file == null) {
-                    return new DownloadResult(null, -1);
-                }
-                if (fc.getSelectedExtensionFilter().getExtensions().contains("*.html")) {
-                    if (fc.getSelectedExtensionFilter().getDescription().contains("HTML")) {
-                        return new DownloadResult(file, DownloadResult.HTML);
+                    fc.getExtensionFilters().add(new ExtensionFilter("Complete WebPage", "*.html"));
+                    fc.getExtensionFilters().add(new ExtensionFilter("HTML File", "*.html"));
+                    if (fc.getExtensionFilters().get(0).getDescription().startsWith("Complete")) {
+                        fc.setInitialFileName("index.html");
+                    }
+                    File file = fc.showSaveDialog(getTabPane().getScene().getWindow());
+                    if (file == null) {
+                        return new DownloadResult(null, -1);
+                    }
+                    if (fc.getSelectedExtensionFilter().getExtensions().contains("*.html")) {
+                        if (fc.getSelectedExtensionFilter().getDescription().contains("HTML")) {
+                            return new DownloadResult(file, DownloadResult.HTML);
+                        } else {
+                            return new DownloadResult(file, DownloadResult.COMPLETE);
+                        }
                     } else {
-                        return new DownloadResult(file, DownloadResult.COMPLETE);
+                        return new DownloadResult(file, DownloadResult.CUSTOM);
                     }
-                } else {
-                    return new DownloadResult(file, DownloadResult.CUSTOM);
+                } catch (Exception e) {
+                    return null;
                 }
             }
 
             @Override
             public DownloadResult downloadImage(String url) {
-                String filename = url.substring(url.lastIndexOf('/') + 1);
-                FileChooser fc = new FileChooser();
-                fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image", "*." + url.substring(url.lastIndexOf('.') + 1)));
-                fc.setInitialFileName(filename);
-                return new DownloadResult(fc.showSaveDialog(getTabPane().getScene().getWindow()), DownloadResult.CUSTOM);
+                try {
+                    String filename = url.substring(url.lastIndexOf('/') + 1);
+                    FileChooser fc = new FileChooser();
+                    fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image", "*." + url.substring(url.lastIndexOf('.') + 1)));
+                    fc.setInitialFileName(filename);
+                    return new DownloadResult(fc.showSaveDialog(getTabPane().getScene().getWindow()), DownloadResult.CUSTOM);
+                } catch (Exception e) {
+                    return null;
+                }
             }
         });
         view.getEngine().setViewSourceHandler((VelocityEngine engine) -> {
             BrowserView bv;
-            getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, bv = new BrowserView(""));
+            getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, bv = new BrowserView("", incog));
             getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
             return bv.view.getEngine();
         });
@@ -317,7 +329,7 @@ public class BrowserView extends Tab implements Serializable {
         view.getEngine().setPopupHandler(new PopupHandler() {
             @Override
             public VelocityEngine createPopup(PopupFeatures feat) {
-                BrowserView view = new BrowserView("");
+                BrowserView view = new BrowserView("", incog);
                 getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, view);
                 getTabPane().getSelectionModel().select(view);
                 return view.view.getEngine();
@@ -325,7 +337,7 @@ public class BrowserView extends Tab implements Serializable {
 
             @Override
             public void launchPopup(String url) {
-                getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView(url));
+                getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView(url, incog));
                 getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
             }
         });
@@ -607,22 +619,22 @@ public class BrowserView extends Tab implements Serializable {
     }
 
     public final void newTab() {
-        getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView(""));
+        getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("", view.getEngine().isIncognito()));
         getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
     }
 
     public final void history() {
-        getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("velocityfx://history"));
+        getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("velocityfx://history", view.getEngine().isIncognito()));
         getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
     }
 
     public final void settings() {
-        getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("velocityfx://settings"));
+        getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("velocityfx://settings", view.getEngine().isIncognito()));
         getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
     }
 
     public final void downloads() {
-        getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("velocityfx://downloads"));
+        getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("velocityfx://downloads", view.getEngine().isIncognito()));
         getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
     }
 
@@ -637,7 +649,7 @@ public class BrowserView extends Tab implements Serializable {
     private void load(String url) {
         if (!url.isEmpty()) {
             if (!url.contains(":")) {
-                url = "https://" + url;
+                url = "http://" + url;
             }
             loadUrl(url);
         } else {
