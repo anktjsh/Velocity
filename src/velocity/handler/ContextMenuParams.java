@@ -12,7 +12,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Node;
 import javafx.scene.control.MenuItem;
 import velocity.core.VelocityEngine;
 
@@ -50,13 +49,61 @@ public class ContextMenuParams {
         this.selectionText = selectionText;
         this.hasImage = hasImage;
         temp = FXCollections.observableArrayList();
-        for (Node n : cmc.getItemsContainer().getChildren()) {
-            if (n instanceof MenuItemContainer) {
-                MenuItemContainer mic = (MenuItemContainer) n;
+        for (int x = cmc.getItemsContainer().getChildren().size() - 1; x >= 0; x--) {
+            if (cmc.getItemsContainer().getChildren().get(x) instanceof MenuItemContainer) {
+                MenuItemContainer mic = (MenuItemContainer) cmc.getItemsContainer().getChildren().get(x);
+                switch (mic.getItem().getText()) {
+                    case "Go Back":
+                        cmc.getItemsContainer().getChildren().set(x, cmc.new MenuItemContainer(getBackItem()));
+                        break;
+                    case "Go Forward":
+                        cmc.getItemsContainer().getChildren().set(x, cmc.new MenuItemContainer(getForwardItem()));
+                        break;
+                    case "Stop loading":
+                        cmc.getItemsContainer().getChildren().set(x, cmc.new MenuItemContainer(getStopMenuItem()));
+                        break;
+                    case "Reload page":
+                        cmc.getItemsContainer().getChildren().set(x, cmc.new MenuItemContainer(getReloadMenuItem()));
+                        break;
+                    default:
+                        break;
+                }
                 temp.add(mic.getItem().getText());
             }
         }
         itemList = FXCollections.unmodifiableObservableList(temp);
+    }
+
+    private MenuItem getStopMenuItem() {
+        MenuItem item = new MenuItem("Stop loading");
+        item.setOnAction((E) -> {
+            engine.stopLoad();
+        });
+        return item;
+    }
+
+    private MenuItem getReloadMenuItem() {
+        MenuItem item = new MenuItem("Reload page");
+        item.setOnAction((E) -> {
+            engine.refreshPage();
+        });
+        return item;
+    }
+
+    private MenuItem getBackItem() {
+        MenuItem item = new MenuItem("Go Back");
+        item.setOnAction((E) -> {
+            engine.getHistory().go(-1);
+        });
+        return item;
+    }
+
+    private MenuItem getForwardItem() {
+        MenuItem item = new MenuItem("Go Forward");
+        item.setOnAction((E) -> {
+            engine.getHistory().go(1);
+        });
+        return item;
     }
 
     public VelocityEngine getEngine() {

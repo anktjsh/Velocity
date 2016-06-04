@@ -18,6 +18,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.print.PrinterJob;
@@ -26,6 +27,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.web.WebView;
 import javafx.stage.Window;
+import netscape.javascript.JSObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -61,7 +63,6 @@ import velocity.handler.impl.DefaultVelocityListener;
 import velocity.handler.impl.DefaultViewSourceHandler;
 import velocity.manager.DownloadManager;
 import velocity.manager.HistoryManager;
-import velocity.manager.HistoryManager.WebEntry;
 import velocity.view.PdfReader;
 
 /**
@@ -102,6 +103,8 @@ public final class VelocityEngine {
     private String selectedText;
     private String linkText;
 
+    private final History history;
+
     VelocityEngine(VelocityView v) {
         view = v;
         web = new WebView();
@@ -113,28 +116,31 @@ public final class VelocityEngine {
         } else {
             defaultUserAgent = "";
         }
+        history = new History(this);
         web.setOnDragOver((event) -> {
             event.consume();
         });
         web.setOnContextMenuRequested((e) -> {
-            ContextMenuParams params = new ContextMenuParams(this,
-                    getContextMenu(),
-                    linkUrl,
-                    linkText,
-                    srcUrl,
-                    web.getEngine().getLocation(),
-                    selectedText,
-                    isImage);
-            if (getContextMenuHandler() != null) {
-                getContextMenuHandler().showContextMenu(params);
+            if (VelocityCore.isDesktop()) {
+                ContextMenuParams params = new ContextMenuParams(this,
+                        getContextMenu(),
+                        linkUrl,
+                        linkText,
+                        srcUrl,
+                        web.getEngine().getLocation(),
+                        selectedText,
+                        isImage);
+                if (getContextMenuHandler() != null) {
+                    getContextMenuHandler().showContextMenu(params);
+                }
+                isImage = false;
+                srcUrl = "";
+                linkUrl = "";
+                selectedText = "";
+                linkText = "";
             }
-            isImage = false;
-            srcUrl = "";
-            linkUrl = "";
-            selectedText = "";
-            linkText = "";
         });
-        HistoryManager.getInstance().addEngine(web.getEngine());
+        HistoryManager.getInstance().addEngine(this);
         locationProperty.addListener((ob, older, newer) -> {
             if (newer != null) {
                 String contentType = getContentType(newer);
@@ -175,7 +181,7 @@ public final class VelocityEngine {
                             view.setCenter(getVelocityListener().startPage());
                         }
                     }
-                } else if (contentType != null && contentType.startsWith("application/")) {
+                } else if (contentType != null && !(contentType.startsWith("text/") || contentType.startsWith("image/"))) {
                     if (getSaveHandler() != null) {
                         String filename = getFileName(disposition);
                         DownloadResult f = getSaveHandler().automaticDownload(newer, contentType, filename);
@@ -205,11 +211,34 @@ public final class VelocityEngine {
         web.getEngine().titleProperty().addListener((ob, older, newer) -> {
             titleProperty.set(newer);
         });
-        web.getEngine().getHistory().currentIndexProperty().addListener((ob, older, newer) -> {
-            String url = web.getEngine().getHistory().getEntries().get(newer.intValue()).getUrl();
-            locationProperty.set(url);
-            canGoBackProperty.set(internalCanGoBack());
-            canGoForwardProperty.set(internalCanGoForward());
+
+//        history.currentIndexProperty().addListener((ob, older, newer) -> {
+//            String url = getHistory().getCurrentLocation();
+//            locationProperty.set(url);
+//            canGoBackProperty.set(internalCanGoBack());
+//            canGoForwardProperty.set(internalCanGoForward());
+//        });
+        if (VelocityCore.isDesktop()) {
+            web.getEngine().getHistory().currentIndexProperty().addListener((ob, older, newer) -> {
+                String url = web.getEngine().getHistory().getEntries().get(newer.intValue()).getUrl();
+//                System.out.println(url);
+//                System.out.println(web.getEngine().getLocation());
+                if (!web.getEngine().getLocation().equals(url)) {
+                    locationProperty.set(url);
+                    canGoBackProperty.set(internalCanGoBack());
+                    canGoForwardProperty.set(internalCanGoForward());
+                    history.add(url, web.getEngine().getTitle());
+                }
+            });
+        }
+        getHistory().currentLocationProperty().addListener((ob, older, newer) -> {
+            if (!locationProperty.get().equals(newer.getLocation())) {
+                locationProperty.set(newer.getLocation());
+            }
+            boolean canGoBack = internalCanGoBack();
+            boolean canGoForward = internalCanGoForward();
+            canGoBackProperty.set(canGoBack);
+            canGoForwardProperty.set(canGoForward);
         });
         web.getEngine().locationProperty().addListener((o, older, newer) -> {
             if (!locationProperty.get().equals(newer)) {
@@ -217,12 +246,8 @@ public final class VelocityEngine {
             }
             boolean canGoBack = internalCanGoBack();
             boolean canGoForward = internalCanGoForward();
-            if (canGoBackProperty.get() != canGoBack) {
-                canGoBackProperty.set(canGoBack);
-            }
-            if (canGoForwardProperty.get() != canGoForward) {
-                canGoForwardProperty.set(canGoForward);
-            }
+            canGoBackProperty.set(canGoBack);
+            canGoForwardProperty.set(canGoForward);
         });
         web.getEngine().getLoadWorker().progressProperty().addListener((ob, older, newer) -> {
             if (newer != null) {
@@ -331,10 +356,10 @@ public final class VelocityEngine {
         incognitoProperty.addListener((ob, older, newer) -> {
             if (newer) {
                 if (!older) {
-                    HistoryManager.getInstance().removeEngine(web.getEngine());
+                    HistoryManager.getInstance().removeEngine(this);
                 }
             } else if (older) {
-                HistoryManager.getInstance().removeEngine(web.getEngine());
+                HistoryManager.getInstance().removeEngine(this);
             }
         });
     }
@@ -407,6 +432,10 @@ public final class VelocityEngine {
         return web.getEngine().getDocument();
     }
 
+    public ReadOnlyObjectProperty<Document> documentProperty() {
+        return web.getEngine().documentProperty();
+    }
+
     public String getUserAgent() {
         if (VelocityCore.isDesktop()) {
             return web.getEngine().getUserAgent();
@@ -477,8 +506,8 @@ public final class VelocityEngine {
         return locationProperty.get();
     }
 
-    public List<WebEntry> getHistory() {
-        return HistoryManager.getInstance().getHistory(web.getEngine());
+    public History getHistory() {
+        return history;
     }
 
     public void refreshPage() {
@@ -493,7 +522,9 @@ public final class VelocityEngine {
         EventListener listener = (Event evt) -> {
             String domEventType = evt.getType();
             if (domEventType.equals("contextmenu")) {
+                //if not a or image, get parent node
                 String tagName = ((Element) evt.getTarget()).getTagName();
+//                System.out.println(tagName);
                 isImage = tagName.equalsIgnoreCase("img");
                 srcUrl = ((Element) evt.getTarget()).getAttribute("src");
                 linkUrl = ((Element) evt.getTarget()).getAttribute("href");
@@ -503,17 +534,35 @@ public final class VelocityEngine {
                 String id = ((Element) evt.getTarget()).getAttribute("id");
                 linkText = (id == null) ? null : (String) web.getEngine()
                         .executeScript("document.getElementById('" + id + "').innerHTML");
+            } else if (domEventType.equals("click")) {
+//                String tagName = ((Element) evt.getTarget()).getTagName();
+//                if (tagName.equalsIgnoreCase("a")) {
+//                    locationProperty.set(((Element) evt.getTarget()).getAttribute("href"));
+//                } else {
+//                    tagName = ((Element) ((Element) evt.getTarget()).getParentNode()).getTagName();
+//                    if (tagName.equalsIgnoreCase("a")) {
+//                        locationProperty.set(((Element) ((Element) evt.getTarget()).getParentNode()).getAttribute("href"));
+//                    }
+//                }
+
             }
         };
         NodeList nodeList = doc.getElementsByTagName("img");
+        JSObject docu = (JSObject) web.getEngine().executeScript("document");
+//        System.out.println(docu.getMember("links"));
+        JSObject cl = (JSObject) docu.getMember("links");
+//        System.out.println(cl instanceof HTMLCollection);
         //"a"
+        //"area"
         //"img"
         for (int i = 0; i < nodeList.getLength(); i++) {
             ((EventTarget) nodeList.item(i)).addEventListener("contextmenu", listener, false);
         }
         nodeList = doc.getElementsByTagName("a");
+//        System.out.println(nodeList.getLength());
         for (int i = 0; i < nodeList.getLength(); i++) {
             ((EventTarget) nodeList.item(i)).addEventListener("contextmenu", listener, false);
+            ((EventTarget) nodeList.item(i)).addEventListener("click", listener, false);
         }
     }
 
@@ -541,23 +590,32 @@ public final class VelocityEngine {
 
     public void goBack() {
         if (internalCanGoBack()) {
-            web.getEngine().getHistory().go(-1);
+//            web.getEngine().getHistory().go(-1);
+            history.go(-1);
         }
     }
 
     public void goForward() {
         if (internalCanGoForward()) {
-            web.getEngine().getHistory().go(1);
+//            web.getEngine().getHistory().go(1);
+            history.go(1);
         }
     }
 
+//    private boolean internalCanGoBack() {
+//        return web.getEngine().getHistory().getCurrentIndex() != 0;
+//    }
+//
+//    private boolean internalCanGoForward() {
+//        return (web.getEngine().getHistory().getCurrentIndex() != web.getEngine().getHistory().getEntries().size() - 1)
+//                && !(web.getEngine().getHistory().getCurrentIndex() == 0 && web.getEngine().getHistory().getEntries().isEmpty());
+//    }
     private boolean internalCanGoBack() {
-        return web.getEngine().getHistory().getCurrentIndex() != 0;
+        return getHistory().canGoBack();
     }
 
     private boolean internalCanGoForward() {
-        return (web.getEngine().getHistory().getCurrentIndex() != web.getEngine().getHistory().getEntries().size() - 1)
-                && !(web.getEngine().getHistory().getCurrentIndex() == 0 && web.getEngine().getHistory().getEntries().isEmpty());
+        return getHistory().canGoForward();
     }
 
     public boolean canGoBack() {
@@ -643,19 +701,21 @@ public final class VelocityEngine {
     public void saveImage(String url) {
         if (getSaveHandler() != null) {
             DownloadResult f = getSaveHandler().downloadImage(url);
-            download(url, f.getFile(), f.getType());
+            if (f != null) {
+                download(url, f.getFile(), f.getType());
+            }
         }
     }
 
     public void saveAs(String url) {
         if (getSaveHandler() != null) {
             DownloadResult f = getSaveHandler().saveAs(url);
-            download(url, f.getFile(), f.getType());
+            if (f != null) {
+                download(url, f.getFile(), f.getType());
+            }
         }
     }
 
-    //saveHtml
-    //saveCompletePage
     public void setSaveHandler(SaveHandler save) {
         saveHandler.set(save);
     }
@@ -763,6 +823,7 @@ public final class VelocityEngine {
     void dispose() {
         stopLoad();
         load("");
+//        history.dispose();
     }
 
     private String getContentType(String url) {

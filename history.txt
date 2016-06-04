@@ -1,8 +1,47 @@
-https://www.google.com/,Google,2016-05-30,12:23:12.619
-https://www.google.com/intl/en/mail/help/about.html,Gmail - Free Storage and Email from Google,2016-05-30,12:23:26.515
-https://www.google.com/imghp?hl=en&tab=wi&ei=JXdMV4TSHsy-jwOagqVI&ved=0EKouCBYoAQ,Google Images,2016-05-30,12:23:34.903
-https://www.google.com/intl/en/mail/help/about.html,Gmail - Free Storage and Email from Google,2016-05-30,12:23:43.749
-https://accounts.google.com/ServiceLogin?service=mail&continue=https://mail.google.com/mail/,Gmail,2016-05-30,12:23:52.273
-https://www.google.com/,Google,2016-05-30,12:32:28.310
-https://www.google.com/intl/en/mail/help/about.html,Gmail - Free Storage and Email from Google,2016-05-30,12:32:41.977
-https://www.google.com/imghp?hl=en&tab=wi&ei=TnlMV8yWEc_ajwPwhpbAAQ&ved=0EKouCBYoAQ,Google Images,2016-05-30,12:32:46.237
+https://www.google.com/,Google,2016-06-03,18:56:39.995
+https://www.google.com/,Google,2016-06-03,18:59:39.467
+https://www.google.com/,Google,2016-06-03,19:01:16.550
+https://www.google.com/#q=Copa+Am%C3%A9rica+2016+schedule&oi=ddle&hl=en,Google,2016-06-03,19:01:17.592
+https://www.google.com/search?q=Copa+Am%C3%A9rica+2016+schedule&hl=en&biw=800&bih=600&source=lnms&tbm=isch&sa=X&ved=0ahUKEwiOsPDSiI3NAhVJx2MKHdmsB6cQ_AUIBygC,,2016-06-03,19:01:21.098
+about:blank,,2016-06-03,19:01:36.616
+https://www.google.com/,Google,2016-06-03,19:02:55.961
+https://www.google.com/intl/en/mail/help/about.html,,2016-06-03,19:03:14.331
+https://www.google.com/,Google,2016-06-03,19:03:56.595
+https://www.google.com/intl/en/mail/help/about.html,,2016-06-03,19:04:01.851
+https://www.google.com/,Google,2016-06-03,19:04:40.471
+https://www.google.com/,Google,2016-06-03,19:05:29.217
+https://www.google.com/intl/en/mail/help/about.html,,2016-06-03,19:05:35.548
+https://www.google.com/,Google,2016-06-03,19:06:29.537
+https://www.google.com/intl/en/mail/help/about.html,,2016-06-03,19:06:36.494
+https://www.google.com/,Google,2016-06-03,19:07:42.265
+https://www.google.com/#q=Copa+Am%C3%A9rica+2016+schedule&oi=ddle&hl=en,Google,2016-06-03,19:08:54.192
+https://www.google.com/,Google,2016-06-03,19:09:03.713
+about:blank,,2016-06-03,19:09:06.441
+https://www.google.com/intl/en/mail/help/about.html,,2016-06-03,19:09:10.289
+https://www.google.com/,Google,2016-06-03,19:10:05.549
+https://www.google.com/intl/en/mail/help/about.html,Gmail - Free Storage and Email from Google,2016-06-03,19:11:31.181
+https://www.google.com/,Google,2016-06-03,19:12:39.936
+https://www.google.com/intl/en/mail/help/about.html,Gmail - Free Storage and Email from Google,2016-06-03,19:13:02.369
+about:blank,,2016-06-03,19:13:12.101
+https://www.google.com/,Google,2016-06-04,00:09:38.841
+https://www.google.com/intl/en/mail/help/about.html,Gmail - Free Storage and Email from Google,2016-06-04,00:09:56.098
+https://www.google.com/,Google,2016-06-04,00:10:20.130
+https://www.google.com/,Google,2016-06-04,00:13:44.829
+https://www.google.com/intl/en/mail/help/about.html,Gmail - Free Storage and Email from Google,2016-06-04,00:14:16.984
+https://accounts.google.com/ServiceLogin?service=mail&continue=https://mail.google.com/mail/#identifier,Gmail,2016-06-04,00:14:13.238
+https://www.google.com/,Google,2016-06-04,09:11:01.089
+https://www.google.com/intl/en/mail/help/about.html,Gmail - Free Storage and Email from Google,2016-06-04,09:11:08.609
+https://accounts.google.com/ServiceLogin?service=mail&continue=https://mail.google.com/mail/#identifier,Gmail,2016-06-04,09:11:11.115
+https://www.google.com/,Google,2016-06-04,09:13:46.490
+https://www.google.com/intl/en/mail/help/about.html,Gmail - Free Storage and Email from Google,2016-06-04,09:13:53.281
+https://www.google.com/,Google,2016-06-04,09:14:39.974
+https://www.google.com/intl/en/mail/help/about.html,Gmail - Free Storage and Email from Google,2016-06-04,09:14:48.851
+https://www.google.com/,Google,2016-06-04,09:17:23.740
+https://www.google.com/intl/en/mail/help/about.html,Gmail - Free Storage and Email from Google,2016-06-04,09:17:11.786
+https://accounts.google.com/ServiceLogin?service=mail&continue=https://mail.google.com/mail/#identifier,Gmail,2016-06-04,09:17:02.363
+https://www.google.com//images/branding/googlelogo/2x/googlelogo_color_272x92dp.png,,2016-06-04,09:17:21.463
+https://www.google.com/,Google,2016-06-04,09:18:24.266
+https://www.google.com/intl/en/mail/help/about.html,Gmail - Free Storage and Email from Google,2016-06-04,09:18:22.581
+https://www.google.com/intl/en/mail/help/work.html,Gmail for work - Get custom email and more - Google,2016-06-04,09:18:20.523
+https://www.google.com/,Google,2016-06-04,09:19:05.479
+https://www.google.com/intl/en/mail/help/about.html,Gmail - Free Storage and Email from Google,2016-06-04,09:19:08.809

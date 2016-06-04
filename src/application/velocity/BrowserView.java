@@ -15,9 +15,7 @@ import application.view.SettingsPane;
 import application.view.StartPage;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -218,11 +216,7 @@ public class BrowserView extends Tab implements Serializable {
                         if (fileName.contains(".")) {
                             String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
                             File f = FileUtils.newFile("hello." + extension);
-                            String type = null;
-                            try {
-                                type = Files.probeContentType(f.toPath());
-                            } catch (IOException ex) {
-                            }
+                            String type = FileUtils.probeContentType(f);
                             if (type != null) {
                                 fc.getExtensionFilters().add(new ExtensionFilter(extension.toUpperCase() + " File", "*." + extension));
                             }
@@ -573,16 +567,18 @@ public class BrowserView extends Tab implements Serializable {
 
             @Override
             public void onLoadFailed() {
-                view.getEngine().loadHtml("<!DOCTYPE html>\n"
-                        + "<html>\n<head>\n"
-                        + "<title>" + view.getEngine().getLocation() + "</title>\n"
-                        + "</head>"
-                        + "<body>\n"
-                        + "\n"
-                        + "<h1 style=\"text-align:center;\">Unable to reach address</h1>\n"
-                        + "\n"
-                        + "</body>\n"
-                        + "</html>");
+                if (!(view.getEngine().getLocation() == null || view.getEngine().getLocation().isEmpty())) {
+                    view.getEngine().loadHtml("<!DOCTYPE html>\n"
+                            + "<html>\n<head>\n"
+                            + "<title>" + view.getEngine().getLocation() + "</title>\n"
+                            + "</head>"
+                            + "<body>\n"
+                            + "\n"
+                            + "<h1 style=\"text-align:center;\">Unable to reach address</h1>\n"
+                            + "\n"
+                            + "</body>\n"
+                            + "</html>");
+                }
             }
 
             @Override

@@ -7,9 +7,7 @@ package velocity.core;
 
 import com.gluonhq.charm.down.common.PlatformFactory;
 import java.io.File;
-import java.io.IOException;
 import java.net.CookieHandler;
-import java.nio.file.Files;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -30,6 +28,7 @@ import velocity.handler.CookieListener;
 import velocity.handler.FileLauncher;
 import velocity.handler.impl.DefaultCertificateHandler;
 import velocity.handler.impl.DefaultFileLauncher;
+import velocity.util.FileUtils;
 
 /**
  *
@@ -149,11 +148,7 @@ public class VelocityCore {
     }
 
     public static FileLaunchStatus launchFileInBrowser(File f) {
-        String mime = null;
-        try {
-            mime = Files.probeContentType(f.toPath());
-        } catch (IOException ex) {
-        }
+        String mime = FileUtils.probeContentType(f);
         for (String s : supportedFormats) {
             if (f.getAbsolutePath().endsWith(s)) {
                 return FileLaunchStatus.DEFAULT;

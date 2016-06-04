@@ -61,7 +61,6 @@ public class DownloadManager {
     }
 
     public void save() {
-        System.out.println(downloads.size());
         ArrayList<String> al = new ArrayList<>();
         for (Download we : downloads) {
             al.add(we.getRemoteUrl() + "," + we.getLocalFile().getAbsolutePath());

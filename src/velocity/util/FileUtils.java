@@ -16,6 +16,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import velocity.core.VelocityCore;
@@ -119,13 +120,40 @@ public class FileUtils {
         return new File(s);
     }
 
+    public static String probeContentType(File f) {
+        String path = f.getAbsolutePath();
+        if (path.contains(".")) {
+            String extension = path.substring(path.lastIndexOf("."));
+            return getMimeTypes().get(extension);
+        }
+        return null;
+    }
+
+    private static TreeMap<String, String> mimeTypes;
+
+    private static TreeMap<String, String> getMimeTypes() {
+        if (mimeTypes == null) {
+            mimeTypes = new TreeMap<>();
+            Scanner in = new Scanner(FileUtils.class.getResourceAsStream("format.txt"));
+            while (in.hasNextLine()) {
+                String s = in.nextLine();
+                String[] spl = s.split("=");
+                mimeTypes.put(spl[0], spl[1]);
+            }
+        }
+        return mimeTypes;
+    }
+
     public static boolean isUrl(String input) {
         Matcher m = one.matcher(input);
         if (m.matches()) {
             return true;
         }
         m = two.matcher(input);
-        return m.matches();
+        if (m.matches()) {
+            return true;
+        }
+        return input.startsWith("velocityfx://");
     }
     private final static Pattern one = Pattern.compile("(@)?(href=')?(HREF=')?(HREF=\")?(href=\")?(http://)?(https://)?[a-zA-Z_0-9\\-]+(\\.\\w[a-zA-Z_0-9\\-]+)+(/[#&\\n\\-=?\\+\\%/\\.\\w]+)?");
     private final static Pattern two = Pattern.compile("((([A-Za-z]{3,9}:(?:\\/\\/)?)(?:[-;:&=\\+\\$,\\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\\+\\$,\\w]+@)[A-Za-z0-9.-]+)((?:\\/[\\+~%\\/.\\w-_]*)?\\??(?:[-\\+=&;%@.\\w_]*)#?(?:[\\w]*))?)");
