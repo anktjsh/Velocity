@@ -30,33 +30,46 @@ public class History {
     public History(VelocityEngine eng) {
         engine = eng;
         currentIndex = new ReadOnlyObjectWrapper<>();
-        eng.documentProperty().addListener((ob, older, newer) -> {
-            if (newer != null) {
-//                JSObject history = (JSObject) eng.executeScript("history");
-//                System.out.println(newer.getDocumentURI());
-                JSObject docu = (JSObject) eng.executeScript("document");
-//                System.out.println(docu.getMember("title"));
-//                System.out.println(docu.getMember("URL"));
-//                System.out.println(engine.getLocation());
-//                System.out.println(history.getMember("length"));
-                String s = eng.getLocation();
-                if (s != null && !s.isEmpty() && !s.equals("about:blank")) {
-                    if (tree == null) {
-                        tree = new Trie(newer.getDocumentURI(), (String) docu.getMember("title"));
-                        tree.currentNode.addListener((ab, older2, newer2) -> {
-                            if (newer2 != null) {
-//                                System.out.println("PRinting");
-//                                System.out.println(newer2.location);
-                                currentIndex.set(newer2);
-                            }
-                        });
-                    } else {
-                        tree.add(newer.getDocumentURI(), (String) docu.getMember("title"));
+        if (VelocityCore.isDesktop()) {
+            eng.documentProperty().addListener((ob, older, newer) -> {
+                if (newer != null) {
+                    JSObject docu = (JSObject) eng.executeScript("document");
+                    String s = eng.getLocation();
+                    if (s != null && !s.isEmpty() && !s.equals("about:blank")) {
+                        if (tree == null) {
+                            tree = new Trie(newer.getDocumentURI(), (String) docu.getMember("title"));
+                            tree.currentNode.addListener((ab, older2, newer2) -> {
+                                if (newer2 != null) {
+                                    currentIndex.set(newer2);
+                                }
+                            });
+                        } else {
+                            tree.add(newer.getDocumentURI(), (String) docu.getMember("title"));
+                        }
                     }
                 }
-            }
-        });
-
+            });
+        } else {
+            eng.locationProperty().addListener((ob, older, newer) -> {
+                if (newer != null) {
+                    String s = eng.getLocation();
+                    if (s != null && !s.isEmpty() && !s.equals("about:blank")) {
+                        if (!s.startsWith("velocityfx://")) {
+                            if (tree == null) {
+                                tree = new Trie(s, "");
+                                tree.currentNode.addListener((ab, older2, newer2) -> {
+                                    if (newer2 != null) {
+                                        currentIndex.set(newer2);
+                                    }
+                                });
+                            } else {
+                                tree.add(s, "");
+                            }
+                        }
+                    }
+                }
+            });
+        }
         entries = FXCollections.observableArrayList();
     }
 
@@ -131,11 +144,7 @@ public class History {
             if (canGoBack()) {
                 lastNode = currentNode.get();
                 currentNode.set(currentNode.get().goBack());
-//                if (VelocityCore.isDesktop()) {
-//                    engine.executeScript("history.back()");
-//                } else {
                 engine.load(currentNode.get().location);
-//                }
             }
         }
 
@@ -143,16 +152,11 @@ public class History {
             if (canGoForward()) {
                 lastNode = currentNode.get();
                 currentNode.set(currentNode.get().goForward());
-//                if (VelocityCore.isDesktop()) {
-//                    engine.executeScript("history.back()");
-//                } else {
                 engine.load(currentNode.get().location);
-//                }
             }
         }
 
         public void add(String s, String t) {
-//            System.out.println(s);
             if (!wentBack() && !wentForward()) {
                 if (!currentNode.get().location.equals(s)) {
                     lastNode = null;

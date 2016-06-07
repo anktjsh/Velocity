@@ -140,7 +140,7 @@ public final class VelocityEngine {
                 linkText = "";
             }
         });
-        HistoryManager.getInstance().addEngine(this);
+        HistoryManager.getInstance().addEngine(VelocityEngine.this);
         locationProperty.addListener((ob, older, newer) -> {
             if (newer != null) {
                 String contentType = getContentType(newer);
@@ -511,7 +511,11 @@ public final class VelocityEngine {
     }
 
     public void refreshPage() {
-        web.getEngine().reload();
+        if (VelocityCore.isDesktop()) {
+            web.getEngine().reload();
+        } else {
+            web.getEngine().load(web.getEngine().getLocation());
+        }
     }
 
     public void stopLoad() {

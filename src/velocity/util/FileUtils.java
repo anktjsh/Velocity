@@ -64,6 +64,7 @@ public class FileUtils {
         while ((n = source.read(buf)) > 0) {
             sink.write(buf, 0, n);
         }
+        sink.close();
     }
 
     public static void delete(File f) {
