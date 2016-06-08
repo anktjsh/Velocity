@@ -164,26 +164,28 @@ public class BrowserPane extends BorderPane {
                 String OS = System.getProperty("os.name").toLowerCase();
                 String ver = increment();
                 if (!ver.equals(BrowserPane.VERSION)) {
-                    String se;
-                    if (OS.startsWith("win")) {
-                        se = "https://github.com/anktjsh/Velocity/releases/download/v" + ver + "/Velocity-" + ver + ".exe";
-                    } else {
-                        se = "https://github.com/anktjsh/Velocity/releases/download/v" + ver + "/Velocity-" + ver + ".pkg";
-                    }
-                    File f = new File(new File("").getAbsolutePath() + File.separator + "Velocity-" + ver + "." + (OS.startsWith("win") ? "exe" : "pkg"));
-                    Download d = new Download(se, f, null, DownloadResult.CUSTOM);
-                    d.setOnSucceeded((e) -> {
-                        Optional<ButtonType> o = DialogUtils.showAlert(AlertType.CONFIRMATION, getScene() == null ? null : getScene().getWindow(), "Update", "An Update to Velocity to available!\nWould you like to restart Velocity?", "");
-                        if (o.isPresent()) {
-                            if (o.get() == ButtonType.OK) {
-                                (new Thread(() -> {
-                                    update(d.getLocalFile());
-                                    Desktop.close(BrowserPane.this);
-                                })).start();
-                            }
+                    if (ver.compareTo(BrowserPane.VERSION) > 1) {
+                        String se;
+                        if (OS.startsWith("win")) {
+                            se = "https://github.com/anktjsh/Velocity/releases/download/v" + ver + "/Velocity-" + ver + ".exe";
+                        } else {
+                            se = "https://github.com/anktjsh/Velocity/releases/download/v" + ver + "/Velocity-" + ver + ".pkg";
                         }
-                    });
-                    (new Thread(d)).start();
+                        File f = new File(new File("").getAbsolutePath() + File.separator + "Velocity-" + ver + "." + (OS.startsWith("win") ? "exe" : "pkg"));
+                        Download d = new Download(se, f, null, DownloadResult.CUSTOM);
+                        d.setOnSucceeded((e) -> {
+                            Optional<ButtonType> o = DialogUtils.showAlert(AlertType.CONFIRMATION, getScene() == null ? null : getScene().getWindow(), "Update", "An Update to Velocity to available!\nWould you like to restart Velocity?", "");
+                            if (o.isPresent()) {
+                                if (o.get() == ButtonType.OK) {
+                                    (new Thread(() -> {
+                                        update(d.getLocalFile());
+                                        Desktop.close(BrowserPane.this);
+                                    })).start();
+                                }
+                            }
+                        });
+                        (new Thread(d)).start();
+                    }
                 }
             }
         }
