@@ -178,12 +178,14 @@ public class Desktop extends Application {
                                             if (ww instanceof Stage) {
                                                 Stage s = (Stage) ww;
                                                 if (s.getScene().getRoot() instanceof BrowserPane) {
-                                                    s.fireEvent(
-                                                            new WindowEvent(
-                                                                    s,
-                                                                    WindowEvent.WINDOW_CLOSE_REQUEST
-                                                            )
-                                                    );
+                                                    Platform.runLater(() -> {
+                                                        s.fireEvent(
+                                                                new WindowEvent(
+                                                                        s,
+                                                                        WindowEvent.WINDOW_CLOSE_REQUEST
+                                                                )
+                                                        );
+                                                    });
                                                 }
                                             }
                                         }
