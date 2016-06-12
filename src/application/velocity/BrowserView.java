@@ -37,6 +37,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
@@ -47,6 +48,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.web.PopupFeatures;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 import javafx.util.Pair;
 import velocity.core.VelocityCore;
 import velocity.core.VelocityEngine;
@@ -114,7 +116,7 @@ public class BrowserView extends Tab implements Serializable {
             }
         }
         menu.getItems().get(0).setOnAction((e) -> {
-            view.getEngine().launchPopup("");
+            view.getEngine().launchPopupInTab("");
         });
         menu.getItems().get(1).setOnAction((e) -> {
             getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("", true));
@@ -321,8 +323,19 @@ public class BrowserView extends Tab implements Serializable {
             }
         });
         view.getEngine().setPopupHandler(new PopupHandler() {
+
             @Override
-            public VelocityEngine createPopup(PopupFeatures feat) {
+            public VelocityEngine newWindow() {
+                Stage s = Desktop.getBrowser();
+                BrowserView view = new BrowserView("", incog);
+                TabPane pane = (TabPane)((BorderPane)s.getScene().getRoot()).getCenter();
+                pane.getTabs().set(0, view);
+                s.show();
+                return view.view.getEngine();
+            }
+
+            @Override
+            public VelocityEngine newTab() {
                 BrowserView view = new BrowserView("", incog);
                 getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, view);
                 getTabPane().getSelectionModel().select(view);
@@ -330,9 +343,8 @@ public class BrowserView extends Tab implements Serializable {
             }
 
             @Override
-            public void launchPopup(String url) {
-                getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView(url, incog));
-                getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
+            public VelocityEngine newWindow(PopupFeatures feat) {
+                return newWindow();
             }
         });
         view.getEngine().setVelocityListener(new VelocityListener() {

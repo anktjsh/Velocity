@@ -139,7 +139,7 @@ public class DownloadsView extends CustomTab {
                     FileLaunchStatus la = VelocityCore.launchFileInBrowser(down.getLocalFile());
                     switch (la) {
                         case DEFAULT:
-                            engine.getPopupHandler().launchPopup(down.getLocalFile().toURI().toString());
+                            engine.getPopupHandler().newTab().load(down.getLocalFile().toURI().toString());
                             break;
                         case CUSTOM:
                             break;

@@ -27,7 +27,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.web.WebView;
 import javafx.stage.Window;
-import netscape.javascript.JSObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -98,6 +97,7 @@ public final class VelocityEngine {
     private String htmlText = "";
 
     private boolean isImage;
+    private boolean isLink;
     private String srcUrl;
     private String linkUrl;
     private String selectedText;
@@ -129,11 +129,13 @@ public final class VelocityEngine {
                         srcUrl,
                         web.getEngine().getLocation(),
                         selectedText,
-                        isImage);
+                        isImage,
+                        isLink);
                 if (getContextMenuHandler() != null) {
                     getContextMenuHandler().showContextMenu(params);
                 }
                 isImage = false;
+                isLink = false;
                 srcUrl = "";
                 linkUrl = "";
                 selectedText = "";
@@ -290,7 +292,7 @@ public final class VelocityEngine {
         web.getEngine().setCreatePopupHandler((param) -> {
             if (!popupsSuppressed()) {
                 if (getPopupHandler() != null) {
-                    return getPopupHandler().createPopup(param).web.getEngine();
+                    return getPopupHandler().newWindow(param).web.getEngine();
                 }
             } else {
                 VelocityView vv = new VelocityView();
@@ -376,9 +378,15 @@ public final class VelocityEngine {
         incognitoProperty.set(b);
     }
 
-    public void launchPopup(String url) {
+    public void launchPopupInTab(String url) {
         if (getPopupHandler() != null) {
-            getPopupHandler().launchPopup(url);
+            getPopupHandler().newTab().load(url);
+        }
+    }
+    
+    public void launchPopupInWindow(String url) {
+        if (getPopupHandler() != null) {
+            getPopupHandler().newWindow().load(url);
         }
     }
 
@@ -526,47 +534,44 @@ public final class VelocityEngine {
         EventListener listener = (Event evt) -> {
             String domEventType = evt.getType();
             if (domEventType.equals("contextmenu")) {
-                //if not a or image, get parent node
                 String tagName = ((Element) evt.getTarget()).getTagName();
-//                System.out.println(tagName);
-                isImage = tagName.equalsIgnoreCase("img");
-                srcUrl = ((Element) evt.getTarget()).getAttribute("src");
-                linkUrl = ((Element) evt.getTarget()).getAttribute("href");
-                //System.out.println(linkUrl);
-                selectedText = (String) web.getEngine()
-                        .executeScript("window.getSelection().toString()");
-                String id = ((Element) evt.getTarget()).getAttribute("id");
-                linkText = (id == null) ? null : (String) web.getEngine()
-                        .executeScript("document.getElementById('" + id + "').innerHTML");
-            } else if (domEventType.equals("click")) {
-//                String tagName = ((Element) evt.getTarget()).getTagName();
-//                if (tagName.equalsIgnoreCase("a")) {
-//                    locationProperty.set(((Element) evt.getTarget()).getAttribute("href"));
-//                } else {
-//                    tagName = ((Element) ((Element) evt.getTarget()).getParentNode()).getTagName();
-//                    if (tagName.equalsIgnoreCase("a")) {
-//                        locationProperty.set(((Element) ((Element) evt.getTarget()).getParentNode()).getAttribute("href"));
-//                    }
-//                }
-
+                if (tagName.equalsIgnoreCase("img") || tagName.equalsIgnoreCase("a") || tagName.equalsIgnoreCase("area")) {
+                    isImage = tagName.equalsIgnoreCase("img");
+                    isLink = ((Element) evt.getTarget()).hasAttribute("href");
+                    linkUrl = ((Element) evt.getTarget()).getAttribute("href");
+                    srcUrl = ((Element) evt.getTarget()).getAttribute("src");
+                    selectedText = (String) web.getEngine()
+                            .executeScript("window.getSelection().toString()");
+                    String id = ((Element) evt.getTarget()).getAttribute("id");
+                    linkText = (id == null) ? null : (String) web.getEngine()
+                            .executeScript("document.getElementById('" + id + "').innerHTML");
+                } else if (((Element) evt.getTarget()).getParentNode() instanceof Element) {
+                    String tag = ((Element) ((Element) evt.getTarget()).getParentNode()).getTagName();
+                    if (tag.equalsIgnoreCase("a") || tag.equalsIgnoreCase("area")) {
+                        isImage = tag.equalsIgnoreCase("img");
+                        isLink = ((Element) ((Element) evt.getTarget()).getParentNode()).hasAttribute("href");
+                        linkUrl = ((Element) ((Element) evt.getTarget()).getParentNode()).getAttribute("href");
+                        srcUrl = ((Element) ((Element) evt.getTarget()).getParentNode()).getAttribute("src");
+                        selectedText = (String) web.getEngine()
+                                .executeScript("window.getSelection().toString()");
+                        String id = ((Element) ((Element) evt.getTarget()).getParentNode()).getAttribute("id");
+                        linkText = (id == null) ? null : (String) web.getEngine()
+                                .executeScript("document.getElementById('" + id + "').innerHTML");
+                    }
+                }
             }
         };
         NodeList nodeList = doc.getElementsByTagName("img");
-        JSObject docu = (JSObject) web.getEngine().executeScript("document");
-//        System.out.println(docu.getMember("links"));
-        JSObject cl = (JSObject) docu.getMember("links");
-//        System.out.println(cl instanceof HTMLCollection);
-        //"a"
-        //"area"
-        //"img"
         for (int i = 0; i < nodeList.getLength(); i++) {
             ((EventTarget) nodeList.item(i)).addEventListener("contextmenu", listener, false);
         }
         nodeList = doc.getElementsByTagName("a");
-//        System.out.println(nodeList.getLength());
         for (int i = 0; i < nodeList.getLength(); i++) {
             ((EventTarget) nodeList.item(i)).addEventListener("contextmenu", listener, false);
-            ((EventTarget) nodeList.item(i)).addEventListener("click", listener, false);
+        }
+        nodeList = doc.getElementsByTagName("area");
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            ((EventTarget) nodeList.item(i)).addEventListener("contextmenu", listener, false);
         }
     }
 
@@ -594,26 +599,16 @@ public final class VelocityEngine {
 
     public void goBack() {
         if (internalCanGoBack()) {
-//            web.getEngine().getHistory().go(-1);
             history.go(-1);
         }
     }
 
     public void goForward() {
         if (internalCanGoForward()) {
-//            web.getEngine().getHistory().go(1);
             history.go(1);
         }
     }
 
-//    private boolean internalCanGoBack() {
-//        return web.getEngine().getHistory().getCurrentIndex() != 0;
-//    }
-//
-//    private boolean internalCanGoForward() {
-//        return (web.getEngine().getHistory().getCurrentIndex() != web.getEngine().getHistory().getEntries().size() - 1)
-//                && !(web.getEngine().getHistory().getCurrentIndex() == 0 && web.getEngine().getHistory().getEntries().isEmpty());
-//    }
     private boolean internalCanGoBack() {
         return getHistory().canGoBack();
     }
@@ -827,7 +822,7 @@ public final class VelocityEngine {
     void dispose() {
         stopLoad();
         load("");
-//        history.dispose();
+        history.dispose();
     }
 
     private String getContentType(String url) {

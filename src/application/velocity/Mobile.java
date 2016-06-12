@@ -9,13 +9,13 @@ import com.gluonhq.charm.glisten.application.MobileApplication;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.Theme;
+import java.io.File;
 import javafx.application.HostServices;
 import javafx.scene.Scene;
-import javafx.scene.input.DataFormat;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
-import javafx.stage.Stage;
 import velocity.core.VelocityCore;
+import velocity.manager.DownloadManager;
+import velocity.manager.FavoritesManager;
+import velocity.manager.HistoryManager;
 import velocity.manager.SettingsManager;
 
 /**
@@ -29,6 +29,21 @@ public class Mobile extends MobileApplication {
     @Override
     public void init() {
         host = getHostServices();
+        (new Thread(() -> {
+            SettingsManager.initProperty("darkTheme", "false");
+            SettingsManager.initProperty("downloadLocation", System.getProperty("user.home") + File.separator + "Downloads");
+            SettingsManager.load();
+            VelocityCore.setDefaultDownloadsLocation(SettingsManager.getProperty("downloadLocation"));
+        })).start();
+        (new Thread(() -> {
+            DownloadManager.getInstance().load();
+        })).start();
+        (new Thread(() -> {
+            FavoritesManager.getInstance().load();
+        })).start();
+        (new Thread(() -> {
+            HistoryManager.getInstance().load();
+        })).start();
         addViewFactory(HOME_VIEW, () -> {
             View v = new View("MAIN") {
                 @Override
@@ -46,39 +61,6 @@ public class Mobile extends MobileApplication {
     public void postInit(Scene scene) {
         if (Boolean.parseBoolean(SettingsManager.getProperty("darkTheme"))) {
             Theme.DARK.assignTo(scene);
-        }
-        if (VelocityCore.isDesktop()) {
-            Stage primary = (Stage) scene.getWindow();
-            primary.getScene()
-                    .setOnDragOver((event) -> {
-                        Dragboard db = event.getDragboard();
-                        if (db.hasFiles()) {
-                            event.acceptTransferModes(TransferMode.COPY);
-                        } else {
-                            event.consume();
-                        }
-                    });
-            primary.getScene()
-                    .setOnDragDropped((event) -> {
-                        Dragboard db = event.getDragboard();
-                        boolean success = false;
-                        if (db.hasFiles()) {
-                            success = true;
-                            ((BrowserPane) retrieveView(HOME_VIEW).get().getCenter()).loadFiles(db.getFiles());
-                        } else if (db.getContent(new DataFormat("Tab")) != null) {
-
-                        }
-                        event.setDropCompleted(success);
-                        event.consume();
-                    });
-            primary.getScene().setOnKeyPressed((e) -> {
-                ((BrowserPane) retrieveView(HOME_VIEW).get().getCenter()).resolve(e);
-            });
-            primary.getIcons().add(Desktop.web);
-            primary.setTitle("Velocity v" + BrowserPane.VERSION);
-            primary.setOnHidden((e) -> {
-                Desktop.close(((BrowserPane) retrieveView(HOME_VIEW).get().getCenter()));
-            });
         }
     }
 

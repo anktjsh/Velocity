@@ -120,7 +120,7 @@ public class SettingsPane extends CustomTab {
         blocked.setOnMouseClicked((e) -> {
             if (e.getClickCount() == 2) {
                 if (blocked.getSelectionModel().getSelectedItem() != null) {
-                    engine.launchPopup(blocked.getSelectionModel().getSelectedItem());
+                    engine.launchPopupInTab(blocked.getSelectionModel().getSelectedItem());
                     blocked.getItems().remove(blocked.getSelectionModel().getSelectedItem());
                 }
             }
@@ -133,7 +133,7 @@ public class SettingsPane extends CustomTab {
         });
         goToBlocked.setOnAction((E) -> {
             if (blocked.getSelectionModel().getSelectedItem() != null) {
-                engine.launchPopup(blocked.getSelectionModel().getSelectedItem());
+                engine.launchPopupInTab(blocked.getSelectionModel().getSelectedItem());
             }
         });
         blocked.getSelectionModel().selectedItemProperty().addListener((ob, older, newer) -> {

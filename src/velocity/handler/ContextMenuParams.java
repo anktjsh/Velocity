@@ -29,6 +29,7 @@ public class ContextMenuParams {
     private final String pageUrl;
     private final String selectionText;
     private final boolean hasImage;
+    private final boolean isLink;
     private final ObservableList<String> itemList;
     private final ObservableList<String> temp;
 
@@ -39,7 +40,8 @@ public class ContextMenuParams {
             String srcUrl,
             String pageUrl,
             String selectionText,
-            boolean hasImage) {
+            boolean hasImage,
+            boolean isLink) {
         this.engine = engine;
         this.cmc = cmc;
         this.linkUrl = linkUrl;
@@ -48,6 +50,7 @@ public class ContextMenuParams {
         this.pageUrl = pageUrl;
         this.selectionText = selectionText;
         this.hasImage = hasImage;
+        this.isLink = isLink;
         temp = FXCollections.observableArrayList();
         for (int x = cmc.getItemsContainer().getChildren().size() - 1; x >= 0; x--) {
             if (cmc.getItemsContainer().getChildren().get(x) instanceof MenuItemContainer) {
@@ -65,6 +68,16 @@ public class ContextMenuParams {
                     case "Reload page":
                         cmc.getItemsContainer().getChildren().set(x, cmc.new MenuItemContainer(getReloadMenuItem()));
                         break;
+                    case "Open Image in New Window":
+                        //image
+                        //set current one to new window
+                        //add to currne tindex , new tab
+                        break;
+                    case "Open Link in New Window":
+                        //link
+                        //set current one to new window
+                        //add to currne tindex , new tab
+                        break;
                     default:
                         break;
                 }
@@ -72,6 +85,38 @@ public class ContextMenuParams {
             }
         }
         itemList = FXCollections.unmodifiableObservableList(temp);
+    }
+    
+    private MenuItem newImageTab() {
+        MenuItem item = new MenuItem();
+        item.setOnAction((e) -> {
+            
+        });
+        return item;
+    }
+    
+    private MenuItem newImageWindow() {
+        MenuItem item = new MenuItem();
+        item.setOnAction((e) -> {
+            
+        });
+        return item;
+    }
+    
+    private MenuItem newLinkTab() {
+        MenuItem item = new MenuItem();
+        item.setOnAction((e) -> {
+            
+        });
+        return item;
+    }
+    
+    private MenuItem newLinkWindow() {
+        MenuItem item = new MenuItem();
+        item.setOnAction((e) -> {
+            
+        });
+        return item;
     }
 
     private MenuItem getStopMenuItem() {
@@ -166,5 +211,9 @@ public class ContextMenuParams {
 
     public boolean hasImage() {
         return hasImage;
+    }
+
+    public boolean isLink() {
+        return isLink;
     }
 }

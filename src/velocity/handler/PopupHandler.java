@@ -13,8 +13,7 @@ import velocity.core.VelocityEngine;
  * @author Aniket
  */
 public interface PopupHandler {
-
-    public VelocityEngine createPopup(PopupFeatures feat);
-
-    public void launchPopup(String url);
+    public VelocityEngine newWindow();
+    public VelocityEngine newTab();
+    public VelocityEngine newWindow(PopupFeatures feat);
 }

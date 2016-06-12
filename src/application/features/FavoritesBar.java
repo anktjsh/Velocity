@@ -5,6 +5,7 @@
  */
 package application.features;
 
+import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.MapChangeListener;
 import javafx.geometry.Insets;
@@ -27,18 +28,22 @@ public class FavoritesBar extends BorderPane {
         bar.setPadding(new Insets(5));
         FavoritesManager.getInstance().getFavorites().addListener((MapChangeListener.Change<? extends String, ? extends String> change) -> {
             if (change.wasAdded()) {
-                bar.getChildren().add(new FavoritesItem(change.getKey(), change.getValueAdded(), engine));
-                setCenter(bar);
+                Platform.runLater(() -> {
+                    bar.getChildren().add(new FavoritesItem(change.getKey(), change.getValueAdded(), engine));
+                    setCenter(bar);
+                });
             } else if (change.wasRemoved()) {
-                for (int x = bar.getChildren().size() - 1; x >= 0; x--) {
-                    Node n = bar.getChildren().get(x);
-                    if (n instanceof FavoritesItem) {
-                        FavoritesItem fi = (FavoritesItem) n;
-                        if ((change.getValueRemoved().equals(fi.getValue()))) {
-                            bar.getChildren().remove(x);
+                Platform.runLater(() -> {
+                    for (int x = bar.getChildren().size() - 1; x >= 0; x--) {
+                        Node n = bar.getChildren().get(x);
+                        if (n instanceof FavoritesItem) {
+                            FavoritesItem fi = (FavoritesItem) n;
+                            if ((change.getValueRemoved().equals(fi.getValue()))) {
+                                bar.getChildren().remove(x);
+                            }
                         }
                     }
-                }
+                });
             }
         });
         bar.getChildren().addListener((ListChangeListener.Change<? extends Node> c) -> {

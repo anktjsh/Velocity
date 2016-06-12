@@ -26,17 +26,20 @@ public class FavoritesItem extends Button {
             if (engine.getLocation().equals("") || engine.getLocation().equals("about:blank")) {
                 engine.load(url);
             } else {
-                engine.launchPopup(url);
+                engine.launchPopupInTab(url);
             }
         });
-        setContextMenu(new ContextMenu(new MenuItem("Open"), new MenuItem("Open in New Tab"), new MenuItem("Delete")));
+        setContextMenu(new ContextMenu(new MenuItem("Open"), new MenuItem("Open in New Tab"), new MenuItem("Open in New Window"), new MenuItem("Delete")));
         getContextMenu().getItems().get(0).setOnAction((e) -> {
             engine.load(url);
         });
         getContextMenu().getItems().get(1).setOnAction((e) -> {
-            engine.launchPopup(url);
+            engine.launchPopupInTab(url);
         });
         getContextMenu().getItems().get(2).setOnAction((e) -> {
+            engine.launchPopupInWindow(url);
+        });
+        getContextMenu().getItems().get(3).setOnAction((e) -> {
             FavoritesManager.getInstance().getFavorites().remove(name);
         });
     }

@@ -87,7 +87,7 @@ public class DownloadItem extends BorderPane {
             switch (la) {
                 case DEFAULT:
                     if (down.handler != null) {
-                        down.handler.launchPopup(d.getLocalFile().toURI().toString());
+                        down.handler.newTab().load(d.getLocalFile().toURI().toString());
                     }
                     break;
                 case CUSTOM:
@@ -99,7 +99,7 @@ public class DownloadItem extends BorderPane {
             switch (la) {
                 case DEFAULT:
                     if (down.handler != null) {
-                        down.handler.launchPopup(d.getLocalFile().getParentFile().toURI().toString());
+                        down.handler.newTab().load(d.getLocalFile().getParentFile().toURI().toString());
                     }
                     break;
                 case CUSTOM:

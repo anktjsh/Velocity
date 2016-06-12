@@ -113,7 +113,7 @@ public class HistoryPane extends CustomTab {
             box = new HBox(5);
             link = new Hyperlink();
             link.setOnAction((e) -> {
-                engine.launchPopup(link.getText());
+                engine.launchPopupInTab(link.getText());
             });
             setGraphic(box);
             label = new Label("");

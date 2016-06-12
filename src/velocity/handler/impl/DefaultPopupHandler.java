@@ -23,7 +23,7 @@ public class DefaultPopupHandler extends DefaultHandler implements PopupHandler 
     }
 
     @Override
-    public VelocityEngine createPopup(PopupFeatures feat) {
+    public VelocityEngine newWindow() {
         Stage st = new Stage();
         VelocityView vv;
         st.initOwner(getEngine().getVelocityView().getScene() == null ? null : getEngine().getVelocityView().getScene().getWindow());
@@ -33,13 +33,13 @@ public class DefaultPopupHandler extends DefaultHandler implements PopupHandler 
     }
 
     @Override
-    public void launchPopup(String url) {
-        Stage st = new Stage();
-        VelocityView vv;
-        st.initOwner(getEngine().getVelocityView().getScene() == null ? null : getEngine().getVelocityView().getScene().getWindow());
-        st.setScene(new Scene(vv = new VelocityView()));
-        vv.getEngine().load(url);
-        st.show();
+    public VelocityEngine newTab() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public VelocityEngine newWindow(PopupFeatures feat) {
+        return newWindow();
     }
 
 }
