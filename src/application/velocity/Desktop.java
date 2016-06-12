@@ -157,7 +157,7 @@ public class Desktop extends Application {
                 String OS = System.getProperty("os.name").toLowerCase();
                 String ver = increment();
                 if (!ver.equals(BrowserPane.VERSION)) {
-                    if (ver.compareTo(BrowserPane.VERSION) > 1) {
+                    if (ver.compareTo(BrowserPane.VERSION) >= 1) {
                         String se;
                         if (OS.startsWith("win")) {
                             se = "https://github.com/anktjsh/Velocity/releases/download/v" + ver + "/Velocity-" + ver + ".exe";

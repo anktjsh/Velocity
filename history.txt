@@ -66,3 +66,8 @@ https://www.google.com/#q=Phoebe+Snetsinger&oi=ddle&hl=en,Google,2016-06-08,23:2
 https://www.google.com/,Google,2016-06-08,23:26:40.024
 https://www.google.com/search?q=Phoebe+Snetsinger&sa=X&hl=en&biw=800&bih=600&tbm=isch&tbo=u&source=univ&ved=0ahUKEwiFysGejZrNAhVU9mMKHcTBA5IQsAQIGw,Phoebe Snetsinger - Google Search,2016-06-08,23:26:41.197
 https://www.google.com/,Google,2016-06-08,23:26:50.397
+https://www.google.com/,Google,2016-06-11,20:32:04.221
+https://www.google.com/,Google,2016-06-11,20:33:20.064
+https://www.google.com/,Google,2016-06-11,20:34:00.316
+https://www.google.com/,Google,2016-06-11,20:34:55.521
+https://www.google.com/,Google,2016-06-11,20:35:22.930
