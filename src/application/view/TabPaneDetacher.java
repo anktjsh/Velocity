@@ -33,6 +33,7 @@ import javafx.stage.WindowEvent;
 public class TabPaneDetacher {
 
     private BrowserView currentTab;
+    private static final DataFormat format = new DataFormat("VelocityTab");
 
     private TabPaneDetacher() {
     }
@@ -59,7 +60,7 @@ public class TabPaneDetacher {
                                 WritableImage snapshot = currentTab.getContent().snapshot(snapshotParams, null);
                                 Dragboard db = tabPane.startDragAndDrop(TransferMode.ANY);
                                 ClipboardContent clipboardContent = new ClipboardContent();
-                                clipboardContent.put(DataFormat.URL, bv.getVelocityEngine().getLocation());
+                                clipboardContent.put(format, bv.getVelocityEngine().getLocation());
                                 db.setDragView(snapshot, 40, 40);
                                 db.setContent(clipboardContent);
                             }

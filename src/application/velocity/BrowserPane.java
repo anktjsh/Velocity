@@ -9,6 +9,7 @@ import application.features.DownloadBar;
 import application.view.TabPaneDetacher;
 import java.io.File;
 import java.util.List;
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
 import javafx.scene.control.Tab;
@@ -16,6 +17,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.WindowEvent;
 import velocity.core.VelocityCore;
 import velocity.manager.DownloadManager;
 import velocity.manager.FavoritesManager;
@@ -28,7 +30,7 @@ import velocity.manager.SettingsManager;
  */
 public class BrowserPane extends BorderPane {
 
-    public static String VERSION = "1.2.0";
+    public static String VERSION = "1.2.1";
     private final TabPane tabs;
     private final DownloadBar bar;
 
@@ -127,7 +129,14 @@ public class BrowserPane extends BorderPane {
                     int index = getTabPane().getTabs().indexOf(AddTab.this);
                     if (index == 0) {
                         if (VelocityCore.isDesktop()) {
-                            Desktop.close(BrowserPane.this);
+                            Platform.runLater(() -> {
+                                BrowserPane.this.getScene().getWindow().fireEvent(
+                                        new WindowEvent(
+                                                BrowserPane.this.getScene().getWindow(),
+                                                WindowEvent.WINDOW_CLOSE_REQUEST
+                                        )
+                                );
+                            });
                             return;
                         }
                     }
