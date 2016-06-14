@@ -91,3 +91,101 @@ https://www.google.com/,Google,2016-06-11,22:32:53.401
 https://www.google.com/,Google,2016-06-11,22:33:08.558
 https://www.google.com/,Google,2016-06-11,22:33:16.579
 https://www.google.com/,Google,2016-06-11,22:33:24.719
+https://www.google.com/,Google,2016-06-12,19:55:44.653
+https://www.google.com/,Google,2016-06-12,20:46:51.582
+https://www.google.com/,Google,2016-06-12,20:56:03.221
+https://www.google.com/,Google,2016-06-12,20:57:08.406
+https://www.google.com/,Google,2016-06-12,20:57:31.233
+https://www.google.com/search?q=example+pdf+file&oq=example+pdf+file&aqs=chrome..69i57j0l2j69i65j0l2.1918j0j7&sourceid=chrome&ie=UTF-8,example pdf file - Google Search,2016-06-12,20:57:39.470
+https://www.google.com/,Google,2016-06-12,20:57:53.600
+https://www.google.com/,Google,2016-06-12,20:59:28.490
+https://www.google.com/,Google,2016-06-12,21:00:30.602
+https://www.google.com/,Google,2016-06-12,22:42:13.343
+https://www.google.com/,Google,2016-06-12,22:42:29.732
+https://www.google.com/,Google,2016-06-12,22:43:04.894
+https://www.google.com/,Google,2016-06-12,22:45:20.834
+https://www.google.com/,Google,2016-06-12,22:46:09.014
+https://www.google.com/,Google,2016-06-12,22:47:57.656
+https://www.google.com/,Google,2016-06-12,22:50:07.976
+https://www.google.com/,Google,2016-06-12,23:04:23.932
+https://www.google.com/,Google,2016-06-12,23:05:20.162
+https://www.google.com/,Google,2016-06-12,23:06:22
+about:blank,,2016-06-12,23:06:44.967
+about:blank,,2016-06-12,23:06:47.114
+about:blank,,2016-06-12,23:06:48.167
+https://www.google.com/,Google,2016-06-12,23:06:59.679
+https://www.google.com/#q=example+pdf+fil,Google,2016-06-12,23:07:48.815
+https://www.google.com/#q=example+pdf+fil+e,example pdf fil - Google Search,2016-06-12,23:07:54.267
+https://www.google.com/,Google,2016-06-12,23:12:58.646
+https://www.google.com/#q=example+pdf+file,Google,2016-06-12,23:13:07.750
+https://www.google.com/,Google,2016-06-12,23:25:07.850
+https://www.google.com/,Google,2016-06-12,23:26:34.541
+https://www.google.com/,Google,2016-06-12,23:26:37.674
+https://www.google.com/,Google,2016-06-12,23:28:04.785
+https://www.google.com/,Google,2016-06-12,23:47:12.559
+https://www.google.com/,Google,2016-06-13,00:16:36.923
+https://www.google.com/,Google,2016-06-13,00:17:13.021
+https://www.google.com/,Google,2016-06-13,00:18:24.504
+https://www.google.com/,Google,2016-06-13,00:21:19.769
+https://www.google.com/,Google,2016-06-13,00:23:48.203
+https://www.google.com/,Google,2016-06-13,00:25:11.421
+https://www.google.com/,Google,2016-06-13,00:27:25.465
+file:///F:/Google.html,Google,2016-06-13,00:28:01.086
+about:blank,,2016-06-13,00:28:03.798
+about:blank,,2016-06-13,00:28:04.863
+https://www.google.com/,Google,2016-06-13,10:06:09.829
+https://www.google.com/,Google,2016-06-13,10:06:18.780
+file:///F:/Google.html,Google,2016-06-13,10:06:24.454
+about:blank,,2016-06-13,10:06:27.273
+https://www.google.com/,Google,2016-06-13,10:10:56.061
+file:///F:/Google.html,Google,2016-06-13,10:11:01.338
+https://www.google.com/,Google,2016-06-13,10:11:47.600
+https://www.google.com/#q=sample+pdf+file,Google,2016-06-13,10:12:07.346
+https://www.google.com/,Google,2016-06-13,10:14:14.763
+file:///F:/Google.html,Google,2016-06-13,10:14:23.752
+about:blank,,2016-06-13,10:14:26.153
+https://www.google.com/search?q=example+pdf+file&oq=example+pdf+file&aqs=chrome..69i57j0l2j69i65j0l2.1918j0j7&sourceid=chrome&ie=UTF-8,example pdf file - Google Search,2016-06-13,10:14:36.590
+https://www.google.com/,Google,2016-06-13,10:17:23.290
+https://www.google.com/,Google,2016-06-13,10:18:43.099
+about:blank,,2016-06-13,10:19:04.949
+https://www.google.com/,Google,2016-06-13,10:19:08.067
+about:blank,,2016-06-13,10:19:17.481
+about:blank,,2016-06-13,10:19:18.283
+about:blank,,2016-06-13,10:19:20.270
+https://www.google.com/,Google,2016-06-13,10:23:46.793
+https://www.google.com/,Google,2016-06-13,10:24:32.204
+https://www.google.com/,Google,2016-06-13,10:24:52.639
+https://www.google.com/,Google,2016-06-13,10:25:37.977
+https://www.google.com/,Google,2016-06-13,18:04:22.064
+https://www.google.com/,Google,2016-06-13,18:25:06.357
+about:blank,,2016-06-13,18:25:15.342
+about:blank,,2016-06-13,18:25:25.457
+https://www.google.com/,Google,2016-06-13,18:25:52.173
+about:blank,,2016-06-13,18:26:30.494
+https://www.google.com/,Google,2016-06-13,18:26:36.891
+https://www.google.com/#q=sample+pdf+file,sample pdf file - Google Search,2016-06-13,18:26:44.341
+https://www.google.com/,Google,2016-06-13,18:35:27.700
+https://www.google.com/,Google,2016-06-13,18:35:36.277
+https://www.google.com/intl/en/mail/help/about.html,Gmail - Free Storage and Email from Google,2016-06-13,18:35:39.085
+https://www.google.com/,Google,2016-06-13,18:37:25.472
+https://www.google.com/intl/en/mail/help/about.html,Gmail - Free Storage and Email from Google,2016-06-13,18:37:53.768
+https://www.google.com/,Google,2016-06-13,18:38:08.986
+about:blank,,2016-06-13,18:38:19.103
+https://www.google.com/,Google,2016-06-13,18:40:01.268
+https://www.google.com/,Google,2016-06-13,18:40:08.078
+https://www.google.com/,Google,2016-06-13,18:40:08.152
+https://www.google.com/,Google,2016-06-13,18:40:47.871
+about:blank,,2016-06-13,18:41:10.461
+https://www.google.com/,Google,2016-06-13,18:41:47.282
+https://www.google.com/,Google,2016-06-13,18:45:23.910
+https://www.google.com/,Google,2016-06-13,18:46:13.836
+https://www.google.com/,Google,2016-06-13,18:48:37.048
+https://www.google.com/,Google,2016-06-13,18:49:47.958
+https://www.google.com/#q=javafx+webkit+debugger,Google,2016-06-13,18:50:18.751
+https://docs.oracle.com/javafx/2/api/javafx/scene/web/WebEngine.DebuggerImpl.html,WebEngine.DebuggerImpl (JavaFX 2.2),2016-06-13,18:50:16.054
+https://www.google.com/#q=webkit+debugger,javafx webkit debugger - Google Search,2016-06-13,18:51:30.548
+https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=2&cad=rja&uact=8&ved=0ahUKEwjQuLXtmKbNAhVOU1IKHZo1CU0QFggjMAE&url=https%3A%2F%2Ftrac.webkit.org%2Fwiki%2FWebInspector&usg=AFQjCNHdpC2AFK8RuxeB6oNZG6m-_QLPXg&bvm=bv.124272578,d.aXo,,2016-06-13,18:51:03.094
+https://trac.webkit.org/wiki/WebInspector,WebInspector – WebKit,2016-06-13,18:50:38.759
+https://trac.webkit.org/wiki/WebInspector,WebInspector – WebKit,2016-06-13,18:51:01.243
+https://trac.webkit.org/wiki/WebInspector,WebInspector – WebKit,2016-06-13,18:51:04.945
+https://webkit.org/debugging-webkit/,Debugging WebKit | WebKit,2016-06-13,18:51:11.456

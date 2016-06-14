@@ -328,7 +328,7 @@ public class BrowserView extends Tab implements Serializable {
             public VelocityEngine newWindow() {
                 Stage s = Desktop.getBrowser();
                 BrowserView view = new BrowserView("", incog);
-                TabPane pane = (TabPane)((BorderPane)s.getScene().getRoot()).getCenter();
+                TabPane pane = (TabPane) ((BorderPane) s.getScene().getRoot()).getCenter();
                 pane.getTabs().set(0, view);
                 s.show();
                 return view.view.getEngine();

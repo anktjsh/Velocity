@@ -144,7 +144,7 @@ public class HistoryManager {
                 timeVisited.set(newer);
             });
         }
-        
+
         public WebEntry(String a, String b, LocalDate d, LocalTime now) {
             locationProperty = new SimpleObjectProperty<>(a);
             titleProperty = new SimpleObjectProperty<>(b);

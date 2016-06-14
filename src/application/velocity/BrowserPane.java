@@ -6,8 +6,13 @@
 package application.velocity;
 
 import application.features.DownloadBar;
+import application.view.DownloadsView;
+import application.view.HistoryPane;
+import application.view.SettingsPane;
+import application.view.StartPage;
 import application.view.TabPaneDetacher;
 import java.io.File;
+import java.net.URI;
 import java.util.List;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
@@ -18,11 +23,14 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.WindowEvent;
+import javafx.util.Pair;
 import velocity.core.VelocityCore;
 import velocity.manager.DownloadManager;
 import velocity.manager.FavoritesManager;
 import velocity.manager.HistoryManager;
 import velocity.manager.SettingsManager;
+import velocity.plugin.Plugin;
+import velocity.view.PdfReader;
 
 /**
  *
@@ -30,11 +38,30 @@ import velocity.manager.SettingsManager;
  */
 public class BrowserPane extends BorderPane {
 
-    public static String VERSION = "1.2.1";
+    public static String VERSION = "1.3.0";
     private final TabPane tabs;
     private final DownloadBar bar;
 
     public BrowserPane() {
+        VelocityCore.addPlugin(new Plugin(Plugin.PluginFormat.URL, "velocityfx://downloads", (param) -> {
+            return new Pair<>(new DownloadsView(param.getValue()), "Downloads");
+        }));
+        VelocityCore.addPlugin(new Plugin(Plugin.PluginFormat.URL, "velocityfx://history", (param) -> {
+            return new Pair<>(new HistoryPane(param.getValue()), "History");
+        }));
+        VelocityCore.addPlugin(new Plugin(Plugin.PluginFormat.URL, "velocityfx://settings", (param) -> {
+            return new Pair<>(new SettingsPane(param.getValue()), "Settings");
+        }));
+        VelocityCore.addPlugin(new Plugin(Plugin.PluginFormat.FILE_EXTENSION, ".pdf", (param) -> {
+            File f = new File(URI.create(param.getKey()));
+            return new Pair<>(new PdfReader(f), f.getName());
+        }));
+        VelocityCore.addPlugin(new Plugin(Plugin.PluginFormat.URL, "", (param) -> {
+            return new Pair<>(new StartPage(param.getValue()), "New Tab");
+        }));
+        VelocityCore.addPlugin(new Plugin(Plugin.PluginFormat.URL, "about:blank", (param) -> {
+            return new Pair<>(new StartPage(param.getValue()), "New Tab");
+        }));
         setCenter(tabs = new TabPane());
         TabPaneDetacher.create().makeTabsDetachable(tabs);
         setBottom((bar = new DownloadBar()));

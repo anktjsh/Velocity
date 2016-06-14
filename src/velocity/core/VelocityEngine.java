@@ -7,7 +7,6 @@ package velocity.core;
 
 import com.sun.javafx.scene.control.skin.ContextMenuContent;
 import java.io.File;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -27,6 +26,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.web.WebView;
 import javafx.stage.Window;
+import javafx.util.Pair;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -62,7 +62,9 @@ import velocity.handler.impl.DefaultVelocityListener;
 import velocity.handler.impl.DefaultViewSourceHandler;
 import velocity.manager.DownloadManager;
 import velocity.manager.HistoryManager;
-import velocity.view.PdfReader;
+import velocity.plugin.Plugin;
+import velocity.util.FileUtils;
+import velocity.view.Viewer;
 
 /**
  *
@@ -145,59 +147,39 @@ public final class VelocityEngine {
         HistoryManager.getInstance().addEngine(VelocityEngine.this);
         locationProperty.addListener((ob, older, newer) -> {
             if (newer != null) {
-                String contentType = getContentType(newer);
-                List<String> disposition = getContentDisposition(newer);
-                if (newer.equals("velocityfx://downloads")) {
-                    view.setCenter(null);
-                    titleProperty.set("Downloads");
-                    if (getVelocityListener() != null) {
-                        view.setCenter(getVelocityListener().showDownloads(newer));
-                    }
-                } else if (newer.equals("velocityfx://history")) {
-                    view.setCenter(null);
-                    titleProperty.set("History");
-                    if (getVelocityListener() != null) {
-                        view.setCenter(getVelocityListener().showHistory(newer));
-                    }
-                } else if (newer.startsWith("velocityfx://settings")) {
-                    view.setCenter(null);
-                    titleProperty.set("Settings");
-                    if (getVelocityListener() != null) {
-                        view.setCenter(getVelocityListener().showSettings(newer));
-                    }
+                Plugin plugin = null;
+                boolean supported = false;
+                if (htmlText.isEmpty() && (plugin = VelocityCore.getUrlPlugin(newer, this)) != null) {
+                    Pair<Node, String> pa;
+                    view.setCenter((pa = plugin.getNodeAndTitle(this, newer)).getKey());
+                    titleProperty.set(pa.getValue());
+                    supported = true;
                 } else if (newer.startsWith("velocityfx://source-")) {
                     if (newer.contains("\t")) {
                         String[] spl = newer.split("\t");
-                        view.setCenter(null);
                         titleProperty.set("View Source");
-                        if (getVelocityListener() != null) {
-                            view.setCenter(getVelocityListener().showPageSource(spl[0] + spl[1], spl[2]));
-                        }
+                        view.setCenter(new Viewer(spl[2]));
                         locationProperty.set(spl[0] + spl[1]);
-                    }
-                } else if (newer.isEmpty() || newer.equals("about:blank")) {
-                    if (htmlText.isEmpty()) {
-                        titleProperty.set("New Tab");
-                        view.setCenter(null);
-                        if (getVelocityListener() != null) {
-                            view.setCenter(getVelocityListener().startPage());
-                        }
-                    }
-                } else if (contentType != null && !(contentType.startsWith("text/") || contentType.startsWith("image/"))) {
-                    if (getSaveHandler() != null) {
-                        String filename = getFileName(disposition);
-                        DownloadResult f = getSaveHandler().automaticDownload(newer, contentType, filename);
-                        if (f != null) {
-                            download(newer, f.getFile(), f.getType());
-                        }
+                    } 
+                    supported = true;
+                }
+                String contentType = getContentType(newer);
+                List<String> disposition = getContentDisposition(newer);
+                if ((contentType != null && !contentType.isEmpty())
+                        && !(contentType.startsWith("text/")) && !contentType.startsWith("image/")
+                        && (!newer.isEmpty() && !newer.equals("about:blank"))
+                        && getSaveHandler() != null && !supported) {
+                    String filename = getFileName(disposition);
+                    DownloadResult f = getSaveHandler().automaticDownload(newer, contentType, filename);
+                    if (f != null) {
+                        download(newer, f.getFile(), f.getType());
                     }
                     reloadThread();
-                } else if (newer.endsWith(".pdf")) {
-                    view.setCenter(null);
-                    File f;
-                    view.setCenter(new PdfReader(f = new File(URI.create(newer))));
-                    titleProperty.set(f.getName());
-                } else if (!(view.getCenter() instanceof WebView)) {
+                } else if (htmlText.isEmpty() && FileUtils.isFile(newer) && (plugin = VelocityCore.getFilePlugin(newer, this)) != null) {
+                    Pair<Node, String> pa;
+                    view.setCenter((pa = plugin.getNodeAndTitle(this, newer)).getKey());
+                    titleProperty.set(pa.getValue());
+                } else if (!(view.getCenter() instanceof WebView) && !supported) {
                     view.setCenter(web);
                 }
                 htmlText = "";
@@ -213,18 +195,9 @@ public final class VelocityEngine {
         web.getEngine().titleProperty().addListener((ob, older, newer) -> {
             titleProperty.set(newer);
         });
-
-//        history.currentIndexProperty().addListener((ob, older, newer) -> {
-//            String url = getHistory().getCurrentLocation();
-//            locationProperty.set(url);
-//            canGoBackProperty.set(internalCanGoBack());
-//            canGoForwardProperty.set(internalCanGoForward());
-//        });
         if (VelocityCore.isDesktop()) {
             web.getEngine().getHistory().currentIndexProperty().addListener((ob, older, newer) -> {
                 String url = web.getEngine().getHistory().getEntries().get(newer.intValue()).getUrl();
-//                System.out.println(url);
-//                System.out.println(web.getEngine().getLocation());
                 if (!web.getEngine().getLocation().equals(url)) {
                     locationProperty.set(url);
                     canGoBackProperty.set(internalCanGoBack());
@@ -383,7 +356,7 @@ public final class VelocityEngine {
             getPopupHandler().newTab().load(url);
         }
     }
-    
+
     public void launchPopupInWindow(String url) {
         if (getPopupHandler() != null) {
             getPopupHandler().newWindow().load(url);
@@ -415,15 +388,18 @@ public final class VelocityEngine {
     }
 
     private String getFileName(List<String> disposition) {
-        if (disposition != null) {
-            String one = disposition.get(0);
-            if (one.contains("filename*=UTF-8''")) {
-                String temp = one.substring(one.indexOf("filename*=UTF-8''") + "filename*=UTF-8''".length());
-                return temp;
-            } else if (one.contains("filename=\"")) {
-                String temp = one.substring(one.indexOf("filename=\"") + "filename=\"".length());
-                return temp.substring(0, temp.indexOf('"'));
+        try {
+            if (disposition != null) {
+                String one = disposition.get(0);
+                if (one.contains("filename*=UTF-8''")) {
+                    String temp = one.substring(one.indexOf("filename*=UTF-8''") + "filename*=UTF-8''".length());
+                    return temp;
+                } else if (one.contains("filename=\"")) {
+                    String temp = one.substring(one.indexOf("filename=\"") + "filename=\"".length());
+                    return temp.substring(0, temp.indexOf('"'));
+                }
             }
+        } catch (Exception e) {
         }
         return null;
     }

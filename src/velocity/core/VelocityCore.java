@@ -28,6 +28,7 @@ import velocity.handler.CookieListener;
 import velocity.handler.FileLauncher;
 import velocity.handler.impl.DefaultCertificateHandler;
 import velocity.handler.impl.DefaultFileLauncher;
+import velocity.plugin.Plugin;
 import velocity.util.FileUtils;
 
 /**
@@ -47,6 +48,42 @@ public class VelocityCore {
     public static String DESKTOP = PlatformFactory.DESKTOP;
     public static String ANDROID = PlatformFactory.ANDROID;
     public static String IOS = PlatformFactory.IOS;
+    private static final ArrayList<Plugin> plugins = new ArrayList<>();
+
+    public static Plugin getUrlPlugin(String url, VelocityEngine eng) {
+        for (Plugin p : plugins) {
+            switch (p.getFormat()) {
+                case URL:
+                    if (url.equals(p.getId())) {
+                        return p;
+                    }
+                    break;
+            }
+        }
+        return null;
+    }
+
+    public static Plugin getFilePlugin(String url, VelocityEngine eng) {
+        File f = new File(url);
+        for (Plugin p : plugins) {
+            switch (p.getFormat()) {
+                case FILE_EXTENSION:
+                    if (f.getName().endsWith(p.getId())) {
+                        return p;
+                    }
+                    break;
+            }
+        }
+        return null;
+    }
+
+    public static void addPlugin(Plugin p) {
+        plugins.add(p);
+    }
+
+    public static void removePlugin(Plugin p) {
+        plugins.remove(p);
+    }
 
     public static boolean isDesktop() {
         return current.equals(DESKTOP);

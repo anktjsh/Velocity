@@ -68,16 +68,14 @@ public class ContextMenuParams {
                     case "Reload page":
                         cmc.getItemsContainer().getChildren().set(x, cmc.new MenuItemContainer(getReloadMenuItem()));
                         break;
-                    case "Open Image in New Window":
-                        //image
-                        //set current one to new window
-                        //add to currne tindex , new tab
-                        break;
-                    case "Open Link in New Window":
-                        //link
-                        //set current one to new window
-                        //add to currne tindex , new tab
-                        break;
+//                    case "Open Image in New Window":
+//                        cmc.getItemsContainer().getChildren().set(x, cmc.new MenuItemContainer(newImageWindow()));
+//                        cmc.getItemsContainer().getChildren().add(x, cmc.new MenuItemContainer(newImageTab()));
+//                        break;
+//                    case "Open Link in New Window":
+//                        cmc.getItemsContainer().getChildren().set(x, cmc.new MenuItemContainer(newLinkWindow()));
+//                        cmc.getItemsContainer().getChildren().add(x, cmc.new MenuItemContainer(newLinkTab()));
+//                        break;
                     default:
                         break;
                 }
@@ -86,38 +84,38 @@ public class ContextMenuParams {
         }
         itemList = FXCollections.unmodifiableObservableList(temp);
     }
-    
-    private MenuItem newImageTab() {
-        MenuItem item = new MenuItem();
-        item.setOnAction((e) -> {
-            
-        });
-        return item;
-    }
-    
-    private MenuItem newImageWindow() {
-        MenuItem item = new MenuItem();
-        item.setOnAction((e) -> {
-            
-        });
-        return item;
-    }
-    
-    private MenuItem newLinkTab() {
-        MenuItem item = new MenuItem();
-        item.setOnAction((e) -> {
-            
-        });
-        return item;
-    }
-    
-    private MenuItem newLinkWindow() {
-        MenuItem item = new MenuItem();
-        item.setOnAction((e) -> {
-            
-        });
-        return item;
-    }
+
+//    private MenuItem newImageTab() {
+//        MenuItem item = new MenuItem("Open Image in New Tab");
+//        item.setOnAction((e) -> {
+//            engine.launchPopupInTab(srcUrl);
+//        });
+//        return item;
+//    }
+//
+//    private MenuItem newImageWindow() {
+//        MenuItem item = new MenuItem("Open Image in New Window");
+//        item.setOnAction((e) -> {
+//            engine.launchPopupInWindow(srcUrl);
+//        });
+//        return item;
+//    }
+//
+//    private MenuItem newLinkTab() {
+//        MenuItem item = new MenuItem("Open Link in New Tab");
+//        item.setOnAction((e) -> {
+//            engine.launchPopupInTab(linkUrl);
+//        });
+//        return item;
+//    }
+//
+//    private MenuItem newLinkWindow() {
+//        MenuItem item = new MenuItem("Open Link in New Window");
+//        item.setOnAction((e) -> {
+//            engine.launchPopupInWindow(linkUrl);
+//        });
+//        return item;
+//    }
 
     private MenuItem getStopMenuItem() {
         MenuItem item = new MenuItem("Stop loading");
