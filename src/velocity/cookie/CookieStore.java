@@ -56,10 +56,6 @@ final class CookieStore {
      * Creates a new {@code CookieStore}.
      */
     CookieStore() {
-        load();
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            save();
-        }));
     }
 
     public void remove(Cookie c) {

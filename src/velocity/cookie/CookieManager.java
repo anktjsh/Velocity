@@ -37,6 +37,24 @@ public final class CookieManager extends CookieHandler {
     public CookieManager() {
     }
 
+    public static void load() {
+        if (CookieHandler.getDefault() instanceof CookieManager) {
+            CookieManager cm = (CookieManager) CookieHandler.getDefault();
+            cm.store.load();
+        } else {
+            VelocityCore.init();
+            CookieManager cm = (CookieManager) CookieHandler.getDefault();
+            cm.store.load();
+        }
+    }
+
+    public static void save() {
+        if (CookieHandler.getDefault() instanceof CookieManager) {
+            CookieManager cm = (CookieManager) CookieHandler.getDefault();
+            cm.store.save();
+        }
+    }
+
     public void remove(Cookie co) {
         store.remove(co);
     }

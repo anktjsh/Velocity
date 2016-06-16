@@ -38,8 +38,8 @@ public class DefaultPopupHandler extends DefaultHandler implements PopupHandler 
     }
 
     @Override
-    public VelocityEngine newWindow(PopupFeatures feat) {
-        return newWindow();
+    public VelocityEngine newTab(PopupFeatures feat) {
+        return newTab();
     }
 
 }

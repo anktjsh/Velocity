@@ -154,6 +154,7 @@ public class DownloadsView extends CustomTab {
             if (item != null) {
                 down = item;
                 name.setText(item.getLocalFile().getAbsolutePath());
+                open.setDisable(!item.getLocalFile().exists());
                 setGraphic(box);
             }
             if (empty) {

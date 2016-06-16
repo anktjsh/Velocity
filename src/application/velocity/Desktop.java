@@ -10,13 +10,11 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Optional;
 import javafx.application.Application;
 import javafx.application.HostServices;
 import javafx.application.Platform;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
@@ -26,6 +24,7 @@ import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
+import velocity.cookie.CookieManager;
 import velocity.core.Download;
 import velocity.core.VelocityCore;
 import velocity.handler.DownloadResult;
@@ -62,31 +61,10 @@ public class Desktop extends Application {
         (new Thread(() -> {
             HistoryManager.getInstance().load();
         })).start();
+        (new Thread(() -> {
+            CookieManager.load();
+        })).start();
         (new Thread(new AutoUpdater())).start();
-        Thread.setDefaultUncaughtExceptionHandler((Thread t, Throwable e) -> {
-            e.printStackTrace();
-            if (e instanceof Error) {
-                Iterator<Window> impl = Stage.impl_getWindows();
-                ArrayList<BrowserPane> bp = new ArrayList<>();
-                while (impl.hasNext()) {
-                    Window w = impl.next();
-                    if (w instanceof Stage) {
-                        Stage s = (Stage) w;
-                        Parent root = s.getScene().getRoot();
-                        if (root instanceof BrowserPane) {
-                            bp.add((BrowserPane) root);
-                        }
-                    }
-                }
-                Platform.runLater(() -> {
-                    for (BrowserPane b : bp) {
-                        b.close();
-                    }
-                    Platform.exit();
-                    System.exit(0);
-                });
-            }
-        });
     }
 
     public static Stage getBrowser(Stage primary) {
@@ -126,6 +104,8 @@ public class Desktop extends Application {
         return primary;
     }
 
+    private Stage first;
+
     public static Stage getBrowser() {
         Stage primary = new Stage();
         return getBrowser(primary);
@@ -134,7 +114,15 @@ public class Desktop extends Application {
     @Override
     public void start(Stage primary) {
         host = getHostServices();
-        getBrowser(primary).show();
+        first = primary;
+        Stage browser = getBrowser(primary);
+        String OS = System.getProperty("os.name").toLowerCase();
+        if (OS.contains("win")) {
+            browser.setMaximized(true);
+        } else if (OS.contains("mac")) {
+            browser.setFullScreen(true);
+        }
+        browser.show();
     }
 
     public static void close(BrowserPane pane) {
@@ -167,7 +155,7 @@ public class Desktop extends Application {
                         File f = new File(new File("").getAbsolutePath() + File.separator + "Velocity-" + ver + "." + (OS.startsWith("win") ? "exe" : "pkg"));
                         Download d = new Download(se, f, null, DownloadResult.CUSTOM);
                         d.setOnSucceeded((e) -> {
-                            Optional<ButtonType> o = DialogUtils.showAlert(AlertType.CONFIRMATION, null, "Update", "An Update to Velocity to available!\nWould you like to restart Velocity?", "");
+                            Optional<ButtonType> o = DialogUtils.showAlert(AlertType.CONFIRMATION, first, "Update", "An Update to Velocity to available!\nWould you like to restart Velocity?", "");
                             if (o.isPresent()) {
                                 if (o.get() == ButtonType.OK) {
                                     (new Thread(() -> {

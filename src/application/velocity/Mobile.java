@@ -12,6 +12,7 @@ import com.gluonhq.charm.glisten.visual.Theme;
 import java.io.File;
 import javafx.application.HostServices;
 import javafx.scene.Scene;
+import velocity.cookie.CookieManager;
 import velocity.core.VelocityCore;
 import velocity.manager.DownloadManager;
 import velocity.manager.FavoritesManager;
@@ -43,6 +44,9 @@ public class Mobile extends MobileApplication {
         })).start();
         (new Thread(() -> {
             HistoryManager.getInstance().load();
+        })).start();
+        (new Thread(() -> {
+            CookieManager.load();
         })).start();
         addViewFactory(HOME_VIEW, () -> {
             View v = new View("MAIN") {

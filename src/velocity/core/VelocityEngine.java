@@ -47,7 +47,6 @@ import velocity.handler.ProgressListener;
 import velocity.handler.PromptHandler;
 import velocity.handler.SaveHandler;
 import velocity.handler.StatusListener;
-import velocity.handler.VelocityListener;
 import velocity.handler.ViewSourceHandler;
 import velocity.handler.WebAlert;
 import velocity.handler.impl.DefaultAlertHandler;
@@ -58,7 +57,6 @@ import velocity.handler.impl.DefaultPopupHandler;
 import velocity.handler.impl.DefaultPrintHandler;
 import velocity.handler.impl.DefaultPromptHandler;
 import velocity.handler.impl.DefaultSaveHandler;
-import velocity.handler.impl.DefaultVelocityListener;
 import velocity.handler.impl.DefaultViewSourceHandler;
 import velocity.manager.DownloadManager;
 import velocity.manager.HistoryManager;
@@ -84,7 +82,6 @@ public final class VelocityEngine {
     private final ObjectProperty<AlertHandler> alertHandler = new SimpleObjectProperty<>();
     private final ObjectProperty<SaveHandler> saveHandler = new SimpleObjectProperty<>();
     private final ObjectProperty<PopupHandler> popupHandler = new SimpleObjectProperty<>();
-    private final ObjectProperty<VelocityListener> velocityListener = new SimpleObjectProperty<>();
     private final ObjectProperty<ConfirmHandler> confirmHandler = new SimpleObjectProperty<>();
     private final ObjectProperty<StatusListener> statusListener = new SimpleObjectProperty<>();
     private final ObjectProperty<LoadListener> loadListener = new SimpleObjectProperty<>();
@@ -110,6 +107,11 @@ public final class VelocityEngine {
     VelocityEngine(VelocityView v) {
         view = v;
         web = new WebView();
+//        try {
+//            DevToolsDebuggerServer.startDebugServer(web.getEngine().impl_getDebugger(), 51742);
+//        } catch (Exception ex) {
+//            Logger.getLogger(VelocityEngine.class.getName()).log(Level.SEVERE, null, ex);
+//        }
         if (VelocityCore.isDesktop()) {
             defaultUserAgent = web.getEngine().getUserAgent();
             if (VelocityCore.getDefaultUserAgent() != null) {
@@ -160,7 +162,7 @@ public final class VelocityEngine {
                         titleProperty.set("View Source");
                         view.setCenter(new Viewer(spl[2]));
                         locationProperty.set(spl[0] + spl[1]);
-                    } 
+                    }
                     supported = true;
                 }
                 String contentType = getContentType(newer);
@@ -174,7 +176,6 @@ public final class VelocityEngine {
                     if (f != null) {
                         download(newer, f.getFile(), f.getType());
                     }
-                    reloadThread();
                 } else if (htmlText.isEmpty() && FileUtils.isFile(newer) && (plugin = VelocityCore.getFilePlugin(newer, this)) != null) {
                     Pair<Node, String> pa;
                     view.setCenter((pa = plugin.getNodeAndTitle(this, newer)).getKey());
@@ -265,7 +266,7 @@ public final class VelocityEngine {
         web.getEngine().setCreatePopupHandler((param) -> {
             if (!popupsSuppressed()) {
                 if (getPopupHandler() != null) {
-                    return getPopupHandler().newWindow(param).web.getEngine();
+                    return getPopupHandler().newTab(param).web.getEngine();
                 }
             } else {
                 VelocityView vv = new VelocityView();
@@ -326,7 +327,6 @@ public final class VelocityEngine {
         setViewSourceHandler(new DefaultViewSourceHandler(this));
         setPopupHandler(new DefaultPopupHandler(this));
         setConfirmHandler(new DefaultConfirmHandler(this));
-        setVelocityListener(new DefaultVelocityListener(this));
         incognitoProperty.set(false);
         incognitoProperty.addListener((ob, older, newer) -> {
             if (newer) {
@@ -715,18 +715,6 @@ public final class VelocityEngine {
         return popupHandlerProperty().get();
     }
 
-    public void setVelocityListener(VelocityListener save) {
-        velocityListener.set(save);
-    }
-
-    public ObjectProperty<VelocityListener> velocityListenerProperty() {
-        return velocityListener;
-    }
-
-    public VelocityListener getVelocityListener() {
-        return velocityListenerProperty().get();
-    }
-
     public void setConfirmHandler(ConfirmHandler save) {
         confirmHandler.set(save);
     }
@@ -799,6 +787,11 @@ public final class VelocityEngine {
         stopLoad();
         load("");
         history.dispose();
+//        try {
+//            DevToolsDebuggerServer.stopDebugServer();
+//        } catch (Exception ex) {
+//            Logger.getLogger(VelocityEngine.class.getName()).log(Level.SEVERE, null, ex);
+//        }
     }
 
     private String getContentType(String url) {
@@ -819,21 +812,6 @@ public final class VelocityEngine {
         } catch (Exception e) {
         }
         return new ArrayList<>();
-    }
-
-    private void reloadThread() {
-        Thread t = new Thread(() -> {
-            try {
-                Thread.sleep(250);
-            } catch (Exception e) {
-            }
-            Platform.runLater(() -> {
-                if (web.getEngine().getLoadWorker().getProgress() == 0) {
-                    web.getEngine().reload();
-                }
-            });
-        });
-        t.start();
     }
 
     public void loadHtml(String html) {

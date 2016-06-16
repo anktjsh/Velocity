@@ -18,5 +18,5 @@ public interface PopupHandler {
 
     public VelocityEngine newTab();
 
-    public VelocityEngine newWindow(PopupFeatures feat);
+    public VelocityEngine newTab(PopupFeatures feat);
 }

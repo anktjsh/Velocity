@@ -98,8 +98,14 @@ public class VelocityCore {
     }
 
     static {
-        initialize();
-        CookieHandler.setDefault(new CookieManager());
+        init();
+    }
+
+    public static void init() {
+        if (!(CookieHandler.getDefault() instanceof CookieManager)) {
+            initialize();
+            CookieHandler.setDefault(new CookieManager());
+        }
     }
 
     private static void initialize() {

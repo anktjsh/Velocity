@@ -8,6 +8,7 @@ package application.velocity;
 import application.features.DownloadBar;
 import application.view.DownloadsView;
 import application.view.HistoryPane;
+import application.view.PdfReader;
 import application.view.SettingsPane;
 import application.view.StartPage;
 import application.view.TabPaneDetacher;
@@ -24,13 +25,13 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.WindowEvent;
 import javafx.util.Pair;
+import velocity.cookie.CookieManager;
 import velocity.core.VelocityCore;
 import velocity.manager.DownloadManager;
 import velocity.manager.FavoritesManager;
 import velocity.manager.HistoryManager;
 import velocity.manager.SettingsManager;
 import velocity.plugin.Plugin;
-import velocity.view.PdfReader;
 
 /**
  *
@@ -38,7 +39,7 @@ import velocity.view.PdfReader;
  */
 public class BrowserPane extends BorderPane {
 
-    public static String VERSION = "1.3.0";
+    public static String VERSION = "1.3.1";
     private final TabPane tabs;
     private final DownloadBar bar;
 
@@ -86,10 +87,19 @@ public class BrowserPane extends BorderPane {
             return true;
         });
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            SettingsManager.save();
             DownloadManager.getInstance().save();
+        }));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             HistoryManager.getInstance().save();
+        }));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             FavoritesManager.getInstance().save();
+        }));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            CookieManager.save();
+        }));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            SettingsManager.save();
         }));
     }
 
