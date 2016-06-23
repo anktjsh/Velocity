@@ -136,13 +136,9 @@ public class DownloadsView extends CustomTab {
             }));
             open.setOnAction((e) -> {
                 if (down != null) {
-                    FileLaunchStatus la = VelocityCore.launchFileInBrowser(down.getLocalFile());
-                    switch (la) {
-                        case DEFAULT:
-                            engine.getPopupHandler().newTab().load(down.getLocalFile().toURI().toString());
-                            break;
-                        case CUSTOM:
-                            break;
+                    FileLaunchStatus la = VelocityCore.launchFileInBrowser(down.getLocalFile(), engine.getPopupHandler());
+                    if (la == FileLaunchStatus.FAILURE) {
+                        DialogUtils.showAlert(Alert.AlertType.ERROR, getScene().getWindow(), "File Launch", "File failed to launch", "");
                     }
                 }
             });

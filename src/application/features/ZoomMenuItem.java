@@ -26,6 +26,7 @@ public class ZoomMenuItem extends CustomMenuItem {
     private final HBox cont;
 
     public ZoomMenuItem(VelocityView web) {
+        super(null, false);
         DecimalFormat df = new DecimalFormat("00");
         setContent(cont = new HBox(10, minus = VelocityCore.isDesktop() ? new Button("-") : MaterialDesignIcon.ZOOM_OUT.button(),
                 name = new Label("Zoom : " + df.format(web.getZoom() * 100) + "%"),

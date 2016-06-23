@@ -65,7 +65,7 @@ import velocity.view.GlistenDoubleInputDialog;
  * @author Aniket
  */
 public class BrowserView extends Tab implements Serializable {
-    
+
     Node refreshGraphic = VelocityCore.isDesktop() ? (new ImageView(new Image(BrowserView.class.getResourceAsStream("reload.png"), 20, 20, true, true))) : MaterialDesignIcon.REFRESH.graphic();//;
     Node cancelGraphic = VelocityCore.isDesktop() ? (new ImageView(new Image(BrowserView.class.getResourceAsStream("cancel.png"), 20, 20, true, true))) : MaterialDesignIcon.CANCEL.graphic();//;
     private final Node incognito = new ImageView(new Image(BrowserView.class.getResourceAsStream("incognito.png"), 20, 20, true, true));
@@ -78,7 +78,7 @@ public class BrowserView extends Tab implements Serializable {
     private final StatusBar status;
     private final ContextMenu menu;
     private final CheckBox dialog, popup;
-    
+
     public BrowserView(String url, boolean incog) {
         super("New Tab");
         view = new VelocityView();
@@ -127,7 +127,7 @@ public class BrowserView extends Tab implements Serializable {
             for (int x = getTabPane().getTabs().size() - 1; x >= 0; x--) {
                 if (index != x) {
                     if (getTabPane().getTabs().get(x) instanceof AddTab) {
-                        
+
                     } else {
                         Event.fireEvent(getTabPane().getTabs().get(x), new Event(Tab.TAB_CLOSE_REQUEST_EVENT));
                         getTabPane().getTabs().remove(x);
@@ -178,7 +178,7 @@ public class BrowserView extends Tab implements Serializable {
             }
         });
         view.getEngine().setSaveHandler(new SaveHandler() {
-            
+
             @Override
             public DownloadResult automaticDownload(String url, String contentType, String name) {
                 try {
@@ -201,7 +201,7 @@ public class BrowserView extends Tab implements Serializable {
                     return null;
                 }
             }
-            
+
             @Override
             public DownloadResult saveAs(String url) {
                 try {
@@ -240,7 +240,7 @@ public class BrowserView extends Tab implements Serializable {
                     return null;
                 }
             }
-            
+
             @Override
             public DownloadResult downloadImage(String url) {
                 try {
@@ -316,17 +316,21 @@ public class BrowserView extends Tab implements Serializable {
             }
         });
         view.getEngine().setPopupHandler(new PopupHandler() {
-            
+
             @Override
             public VelocityEngine newWindow() {
-                Stage s = Desktop.getBrowser();
-                BrowserView view = new BrowserView("", incog);
-                TabPane pane = (TabPane) ((BorderPane) s.getScene().getRoot()).getCenter();
-                pane.getTabs().set(0, view);
-                s.show();
-                return view.view.getEngine();
+                if (VelocityCore.isDesktop()) {
+                    Stage s = Desktop.getBrowser();
+                    BrowserView view = new BrowserView("", incog);
+                    TabPane pane = (TabPane) ((BorderPane) s.getScene().getRoot()).getCenter();
+                    pane.getTabs().set(0, view);
+                    s.show();
+                    return view.view.getEngine();
+                } else {
+                    return newTab();
+                }
             }
-            
+
             @Override
             public VelocityEngine newTab() {
                 BrowserView view = new BrowserView("", incog);
@@ -334,7 +338,7 @@ public class BrowserView extends Tab implements Serializable {
                 getTabPane().getSelectionModel().select(view);
                 return view.view.getEngine();
             }
-            
+
             @Override
             public VelocityEngine newTab(PopupFeatures feat) {
                 return newTab();
@@ -446,6 +450,7 @@ public class BrowserView extends Tab implements Serializable {
                 new MenuItem("New Incognito Tab"),
                 new MenuItem("History\t\tCtrl+H"),
                 new MenuItem("Downloads\tCtrl+J"),
+                //                new FindMenuItem(this),
                 new ZoomMenuItem(view),
                 new MenuItem("Save File As"),
                 new MenuItem("Print\t\t\tCtrl+P"),
@@ -533,15 +538,15 @@ public class BrowserView extends Tab implements Serializable {
                 //take snapshot
                 //thumbnail
             }
-            
+
             @Override
             public void onLoadCancelled() {
             }
-            
+
             @Override
             public void onLoadReady() {
             }
-            
+
             @Override
             public void onLoadFailed() {
                 if (!(view.getEngine().getLocation() == null || view.getEngine().getLocation().isEmpty())) {
@@ -557,11 +562,11 @@ public class BrowserView extends Tab implements Serializable {
                             + "</html>");
                 }
             }
-            
+
             @Override
             public void onLoadScheduled() {
             }
-            
+
             @Override
             public void onLoadRunning() {
             }
@@ -586,39 +591,43 @@ public class BrowserView extends Tab implements Serializable {
         });
         view.getEngine().load(url);
     }
-    
+
     public BrowserView(String url) {
         this(url, false);
     }
-    
+
     public final void newTab() {
         getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("", view.getEngine().isIncognito()));
         getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
     }
-    
+
     public final void history() {
         getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("velocityfx://history", view.getEngine().isIncognito()));
         getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
     }
-    
+
     public final void settings() {
         getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("velocityfx://settings", view.getEngine().isIncognito()));
         getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
     }
-    
+
     public final void downloads() {
         getTabPane().getTabs().add(getTabPane().getTabs().indexOf(BrowserView.this) + 1, new BrowserView("velocityfx://downloads", view.getEngine().isIncognito()));
         getTabPane().getSelectionModel().select(getTabPane().getTabs().indexOf(BrowserView.this) + 1);
     }
-    
+
+//    public final void find() {
+//        options.show();
+//        ((HBox) ((CustomMenuItem) options.getItems().get(4)).getContent()).getChildren().get(0).requestFocus();
+//    }
     public final void print() {
         view.getEngine().print();
     }
-    
+
     public final void exit() {
         Desktop.close((BrowserPane) getTabPane().getParent());
     }
-    
+
     private void load(String url) {
         if (!url.isEmpty()) {
             if (!url.contains(":")) {
@@ -629,13 +638,13 @@ public class BrowserView extends Tab implements Serializable {
             loadUrl(url);
         }
     }
-    
+
     private void loadUrl(String s) {
         view.getEngine().load(s);
     }
-    
+
     public VelocityEngine getVelocityEngine() {
         return view.getEngine();
     }
-    
+
 }

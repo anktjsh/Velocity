@@ -34,7 +34,7 @@ public class DialogUtils {
         } else {
             Alert ale = new Alert(al);
             ale.setTitleText(title);
-            ale.setContentText(head);
+            ale.setContentText(head + "\n" + cont);
             return ale.showAndWait();
         }
     }

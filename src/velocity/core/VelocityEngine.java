@@ -338,7 +338,7 @@ public final class VelocityEngine {
             }
         });
     }
-
+    
     public boolean isIncognito() {
         return incognitoProperty.get();
     }
@@ -495,11 +495,7 @@ public final class VelocityEngine {
     }
 
     public void refreshPage() {
-        if (VelocityCore.isDesktop()) {
-            web.getEngine().reload();
-        } else {
-            web.getEngine().load(web.getEngine().getLocation());
-        }
+        load(getLocation());
     }
 
     public void stopLoad() {

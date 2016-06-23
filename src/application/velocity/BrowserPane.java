@@ -131,6 +131,9 @@ public class BrowserPane extends BorderPane {
                         case P:
                             bv.print();
                             break;
+                        case F:
+//                            bv.find();
+                            break;
                         default:
                             break;
                     }

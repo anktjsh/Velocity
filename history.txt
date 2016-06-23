@@ -9,3 +9,86 @@ https://www.google.com/,Google,2016-06-16,13:09:52.722
 https://www.google.com/,Google,2016-06-16,14:35:16.373
 https://www.google.com/,Google,2016-06-16,14:39:30.326
 https://www.google.com/,Google,2016-06-16,14:39:52.834
+https://www.google.com/,Google,2016-06-16,15:00:54.647
+https://www.google.com/,Google,2016-06-16,15:01:23.779
+file:///F:/test.html,,2016-06-16,15:01:25.723
+https://www.google.com/,Google,2016-06-16,15:15:51.667
+https://www.google.com/,Google,2016-06-16,15:17:05.172
+https://www.google.com/,Google,2016-06-16,15:19:02.484
+https://www.google.com/,Google,2016-06-17,10:19:28.241
+https://www.google.com/,Google,2016-06-17,10:29:02.162
+https://www.google.com/,Google,2016-06-17,10:30:53.263
+https://www.google.com/,Google,2016-06-17,10:41:41.455
+https://www.google.com/#q=fox,Google,2016-06-17,10:41:44.861
+https://www.google.com/,Google,2016-06-17,10:46:13.303
+https://www.google.com/,Google,2016-06-17,10:49:44.319
+https://www.google.com/#q=fox,Google,2016-06-17,10:49:46.777
+https://www.google.com/,Google,2016-06-17,10:50:41.843
+https://www.google.com/#q=Googe+cardboard,Googe cardboard - Google Search,2016-06-17,10:51:02.546
+https://www.google.com/#safe=strict&q=Google,Googe cardboard - Google Search,2016-06-17,10:51:06.164
+https://www.google.com/,Google,2016-06-17,19:45:02.468
+https://www.google.com/,Google,2016-06-17,19:47:16.930
+https://www.google.com/,Google,2016-06-17,19:50:23.184
+https://www.google.com/,Google,2016-06-17,19:52:12
+https://www.google.com/,Google,2016-06-17,23:50:44.563
+http://johannburkard.de/blog/programming/javascript/highlight-javascript-text-higlighting-jquery-plugin.html,highlight: JavaScript text higlighting jQuery plugin,2016-06-17,23:50:57.522
+https://www.google.com/,Google,2016-06-17,23:52:26.477
+http://johannburkard.de/blog/programming/javascript/highlight-javascript-text-higlighting-jquery-plugin.html,highlight: JavaScript text higlighting jQuery plugin,2016-06-17,23:52:35.303
+about:blank,,2016-06-17,23:52:36.589
+https://www.google.com/,Google,2016-06-17,23:55:43.522
+https://www.google.com/,Google,2016-06-18,00:09:41.424
+https://www.google.com/,Google,2016-06-18,00:10:23.668
+https://www.google.com/,Google,2016-06-18,00:12:26.816
+https://www.google.com/,Google,2016-06-18,00:13:57.590
+https://www.google.com/,Google,2016-06-18,00:14:53.573
+https://www.google.com/,Google,2016-06-18,00:16:03.891
+https://www.google.com/,Google,2016-06-18,00:17:36.294
+https://www.google.com/,Google,2016-06-18,00:18:28.850
+https://www.google.com/,Google,2016-06-18,00:26:03.838
+https://www.google.com/,Google,2016-06-18,00:29:38.950
+https://www.google.com/,Google,2016-06-18,00:30:24.537
+http://johannburkard.de/blog/programming/javascript/highlight-javascript-text-higlighting-jquery-plugin.html,highlight: JavaScript text higlighting jQuery plugin,2016-06-18,00:30:34.642
+http://johannburkard.de/contact/,Contact Johann Burkard,2016-06-18,00:30:31.575
+https://www.google.com/,Google,2016-06-18,21:03:09.773
+https://www.youtube.com/,YouTube,2016-06-18,21:04:18.432
+https://www.youtube.com/watch?v=V69nltHcogc,YouTube,2016-06-18,21:04:22.492
+https://www.google.com/,Google,2016-06-18,21:17:10.796
+https://www.google.com/#q=Fox&btnK=Google+Search,Google,2016-06-18,21:17:36.613
+https://www.google.com/,Google,2016-06-18,21:17:41.783
+https://www.google.com/#safe=strict&q=fox,Google,2016-06-18,21:17:43.389
+https://www.google.com/,Google,2016-06-18,21:18:25.308
+https://www.google.com/,Google,2016-06-18,21:22:55.164
+https://www.google.com/,Google,2016-06-18,21:25:24.516
+https://www.google.com/,Google,2016-06-18,21:26:19.880
+https://www.google.com/,Google,2016-06-18,21:27:34.434
+https://www.google.com/,Google,2016-06-18,21:31:22.895
+https://www.google.com/,Google,2016-06-18,21:32:02.588
+https://www.google.com/,Google,2016-06-18,21:32:45.894
+https://www.google.com/,Google,2016-06-18,21:34:53.389
+https://www.google.com/,Google,2016-06-18,21:35:46.731
+https://www.google.com/,Google,2016-06-18,22:59:08.953
+https://www.google.com/,Google,2016-06-18,22:59:35.508
+http://johannburkard.de/blog/programming/javascript/highlight-javascript-text-higlighting-jquery-plugin.html,highlight: JavaScript text higlighting jQuery plugin,2016-06-18,22:59:42.224
+about:blank,,2016-06-18,22:59:43.297
+https://www.google.com/,Google,2016-06-18,23:00:31.150
+https://www.google.com/,Google,2016-06-18,23:04:23.880
+https://www.google.com/,Google,2016-06-18,23:05:44.235
+https://www.google.com/,Google,2016-06-18,23:08:05.904
+https://www.google.com/,Google,2016-06-18,23:09:32.467
+https://www.google.com/,Google,2016-06-18,23:11:44.495
+https://www.google.com/,Google,2016-06-18,23:13:53.107
+https://www.google.com/,Google,2016-06-18,23:15:41.720
+https://www.google.com/,Google,2016-06-18,23:20:15.169
+https://www.google.com/,Google,2016-06-18,23:24:19.706
+https://www.google.com/,Google,2016-06-18,23:26:21.853
+https://www.google.com/,Google,2016-06-18,23:27:01.231
+https://www.google.com/,Google,2016-06-18,23:28:26.116
+https://www.google.com/,Google,2016-06-18,23:29:37.914
+https://www.google.com/,Google,2016-06-18,23:31:37.017
+https://www.google.com/,Google,2016-06-18,23:42:15.674
+https://www.google.com/,Google,2016-06-18,23:49:31.289
+https://www.google.com/,Google,2016-06-18,23:51:29.257
+https://www.google.com/,Google,2016-06-22,21:42:07.355
+https://www.google.com/search?q=subatomic+partiles&oq=subatomic+partiles&aqs=chrome..69i57j0l2j69i65j0l2.1918j0j7&sourceid=chrome&ie=UTF-8,subatomic partiles - Google Search,2016-06-22,21:42:18.258
+https://en.wikipedia.org/wiki/Subatomic_particle,Subatomic particle - Wikipedia, the free encyclopedia,2016-06-22,21:42:56.512
+https://en.wikipedia.org/wiki/Electron_neutrino,Electron neutrino - Wikipedia, the free encyclopedia,2016-06-22,21:42:52.440

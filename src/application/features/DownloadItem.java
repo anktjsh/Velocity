@@ -5,14 +5,9 @@
  */
 package application.features;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.concurrent.Worker;
 import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
@@ -24,6 +19,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import velocity.core.Download;
 import velocity.core.VelocityCore;
+import velocity.util.DialogUtils;
 
 /**
  *
@@ -83,27 +79,15 @@ public class DownloadItem extends BorderPane {
                 new MenuItem("Copy Url to Clipboard"),
                 new MenuItem("Copy File Path to Clipboard"));
         file.getItems().get(0).setOnAction((e) -> {
-            VelocityCore.FileLaunchStatus la = VelocityCore.launchFileInBrowser(d.getLocalFile());
-            switch (la) {
-                case DEFAULT:
-                    if (down.handler != null) {
-                        down.handler.newTab().load(d.getLocalFile().toURI().toString());
-                    }
-                    break;
-                case CUSTOM:
-                    break;
+            VelocityCore.FileLaunchStatus la = VelocityCore.launchFileInBrowser(d.getLocalFile(), down.handler);
+            if (la == VelocityCore.FileLaunchStatus.FAILURE) {
+                DialogUtils.showAlert(Alert.AlertType.ERROR, getScene().getWindow(), "File Launch", "File failed to launch", "");
             }
         });
         file.getItems().get(1).setOnAction((e) -> {
-            VelocityCore.FileLaunchStatus la = VelocityCore.launchFileInBrowser(d.getLocalFile().getParentFile());
-            switch (la) {
-                case DEFAULT:
-                    if (down.handler != null) {
-                        down.handler.newTab().load(d.getLocalFile().getParentFile().toURI().toString());
-                    }
-                    break;
-                case CUSTOM:
-                    break;
+            VelocityCore.FileLaunchStatus la = VelocityCore.launchFileInBrowser(d.getLocalFile().getParentFile(), down.handler);
+            if (la == VelocityCore.FileLaunchStatus.FAILURE) {
+                DialogUtils.showAlert(Alert.AlertType.ERROR, getScene().getWindow(), "File Launch", "File failed to launch", "");
             }
         });
         file.getItems().get(2).setOnAction((e) -> {
@@ -120,21 +104,5 @@ public class DownloadItem extends BorderPane {
             cc.putUrl(d.getLocalFile().toURI().toString());
             cl.setContent(cc);
         });
-    }
-
-    private ArrayList<String> getList(File localFile) {
-        Scanner in = null;
-        try {
-            in = new Scanner(localFile);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(DownloadItem.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        ArrayList<String> al = new ArrayList<>();
-        if (in != null) {
-            while (in.hasNextLine()) {
-                al.add(in.nextLine());
-            }
-        }
-        return al;
     }
 }

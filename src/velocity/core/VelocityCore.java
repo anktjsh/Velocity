@@ -26,6 +26,7 @@ import velocity.cookie.CookieManager;
 import velocity.handler.CertificateHandler;
 import velocity.handler.CookieListener;
 import velocity.handler.FileLauncher;
+import velocity.handler.PopupHandler;
 import velocity.handler.impl.DefaultCertificateHandler;
 import velocity.handler.impl.DefaultFileLauncher;
 import velocity.plugin.Plugin;
@@ -42,7 +43,6 @@ public class VelocityCore {
     private static final ObjectProperty<FileLauncher> fileLauncher = new SimpleObjectProperty<>();
     private static final ObjectProperty<String> defaultUserAgent = new SimpleObjectProperty<>();
     private static final ObjectProperty<String> defaultDownloadsLocation = new SimpleObjectProperty<>();
-    private static final ArrayList<String> supportedFormats = new ArrayList<>();
     private static final ObservableList<String> blocked = FXCollections.observableArrayList();
     public static String current = PlatformFactory.getPlatform().getName();
     public static String DESKTOP = PlatformFactory.DESKTOP;
@@ -147,7 +147,6 @@ public class VelocityCore {
         setCertificateHandler(new DefaultCertificateHandler());
         setFileLauncher(new DefaultFileLauncher());
         defaultDownloadsLocation.set(System.getProperty("user.home") + File.separator + "Downloads");
-        supportedFormats.add(".pdf");
     }
 
     public static void setDefaultUserAgent(String s) {
@@ -190,27 +189,25 @@ public class VelocityCore {
         }
     }
 
-    public static FileLaunchStatus launchFileInBrowser(File f) {
+    public static FileLaunchStatus launchFileInBrowser(File f, PopupHandler handler) {
         String mime = FileUtils.probeContentType(f);
-        for (String s : supportedFormats) {
-            if (f.getAbsolutePath().endsWith(s)) {
-                return FileLaunchStatus.DEFAULT;
-            }
-        }
         if (mime != null) {
             if (mime.startsWith("application/")) {
                 if (launchFile(f)) {
                     return FileLaunchStatus.SUCCESS;
                 }
             } else if (mime.startsWith("image/") || mime.startsWith("text/")) {
-                return FileLaunchStatus.DEFAULT;
+                if (handler != null) {
+                    handler.newTab().load(f.toURI().toString());
+                    return FileLaunchStatus.SUCCESS;
+                }
             } else if (launchFile(f)) {
                 return FileLaunchStatus.SUCCESS;
             }
         } else if (launchFile(f)) {
             return FileLaunchStatus.SUCCESS;
         }
-        return FileLaunchStatus.CUSTOM;
+        return FileLaunchStatus.FAILURE;
     }
 
     private static boolean launchFile(File f) {
@@ -236,6 +233,6 @@ public class VelocityCore {
     }
 
     public enum FileLaunchStatus {
-        DEFAULT, CUSTOM, SUCCESS;
+        FAILURE, SUCCESS;
     }
 }
