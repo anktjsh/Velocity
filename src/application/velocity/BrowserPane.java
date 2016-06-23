@@ -39,7 +39,7 @@ import velocity.plugin.Plugin;
  */
 public class BrowserPane extends BorderPane {
 
-    public static String VERSION = "1.3.1";
+    public static String VERSION = "1.4.0";
     private final TabPane tabs;
     private final DownloadBar bar;
 
